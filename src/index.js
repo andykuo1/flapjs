@@ -16,10 +16,23 @@ const machine = new StateMachine();
 //Setup input
 mouse.events.on('mousedown', function(mouse, button) {
   if (button === 3)
-  machine.markTarget(mouse.x, mouse.y);
+  {
+    //Move target?
+  }
+  else
+  {
+    machine.markTarget(mouse.x, mouse.y);
+  }
 });
 mouse.events.on('mouseup', function(mouse, button) {
-  machine.releaseTarget(mouse.x, mouse.y);
+  if (button === 3)
+  {
+    //Finish moving target?
+  }
+  else
+  {
+    machine.releaseTarget(mouse.x, mouse.y);
+  }
 });
 
 //Setup button
@@ -45,7 +58,7 @@ window.requestAnimationFrame(onAnimationFrame);
 function onAnimationFrame(time)
 {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  machine.onUpdate();
+  machine.onUpdate(time);
   machine.onRender(ctx);
   window.requestAnimationFrame(onAnimationFrame);
 }
@@ -64,9 +77,13 @@ class StateMachine
 
   createNewState()
   {
+    const x = Math.random() * canvas.width;
+    const y = Math.random() * canvas.height;
     const state = {
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
+      x: x,
+      y: y,
+      nextX: x,
+      nextY: y,
       id: this.nextAvailableStateID++,
       accept: false
     };
@@ -134,7 +151,27 @@ class StateMachine
     return null;
   }
 
-  onUpdate()
+  getNearestState(src)
+  {
+    let nearest = null;
+    let ndist = 0;
+    for(const state of this.states)
+    {
+      if (src === state) continue;
+      const dx = src.x - state.x;
+      const dy = src.y - state.y;
+      const dist = dx * dx + dy * dy;
+      if (nearest === null || dist < ndist)
+      {
+        nearest = state;
+        ndist = dist;
+      }
+    }
+
+    return { state: nearest, length: ndist };
+  }
+
+  onUpdate(dt)
   {
     if (this.targetSource !== null)
     {
@@ -148,6 +185,14 @@ class StateMachine
       {
         this.targetDestination = state;
       }
+    }
+
+    for(const state of this.states)
+    {
+      state.x += (state.nextX - state.x) * 0.06;
+      state.y += (state.nextY - state.y) * 0.06;
+      if (Math.abs(state.x - state.nextX) < 0.001) state.nextX = Math.random() * canvas.width;
+      if (Math.abs(state.y - state.nextY) < 0.001) state.nextY = Math.random() * canvas.height;
     }
   }
 
@@ -210,6 +255,15 @@ class StateMachine
   }
 }
 
+function resolveCollisions(states)
+{
+  const collisions = [];
+  for(const state of this.states)
+  {
+    //Implement collision response
+  }
+}
+
 function drawTransition(ctx, src, dst)
 {
   const dx = src.x - dst.x;
@@ -223,6 +277,7 @@ function drawTransition(ctx, src, dst)
   }
   else if (src === dst)
   {
+    //TODO: Try bezierCurveTo
     ctx.beginPath();
     ctx.arc(src.x + STATE_RADIUS_INNER * 4.0 / 3.0, src.y - STATE_RADIUS_INNER * 4.0 / 3.0, STATE_RADIUS_INNER, Math.PI, Math.PI/2);
     //pathArrowHead(ctx, tox, toy, headLength, angle);
