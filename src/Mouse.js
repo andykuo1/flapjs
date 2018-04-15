@@ -30,6 +30,12 @@ class Mouse
     this._touchmove = this.onTouchMove.bind(this);
     this._touchstop = this.onTouchStop.bind(this);
 
+    this._contextmenu = event => {
+      event.preventDefault();
+      return false;
+    };
+
+    this._element.addEventListener('contextmenu', this._contextmenu, false);
     this._element.addEventListener('mouseup', this._mouseup);
     this._element.addEventListener('mousedown', this._mousedown);
     this._element.addEventListener('click', this._mouseclick);
@@ -40,6 +46,7 @@ class Mouse
 
   destroy()
   {
+    this._element.removeEventListener('contextmenu', this._contextmenu);
     this._element.removeEventListener('mouseup', this._mouseup);
     this._element.removeEventListener('mousedown', this._mousedown);
     this._element.removeEventListener('click', this._mouseclick);
@@ -51,19 +58,19 @@ class Mouse
   onMouseUp(event)
   {
     this.onMouseMove(event);
-    this.events.emit('mouseup', this);
+    this.events.emit('mouseup', this, event.which);
   }
 
   onMouseDown(event)
   {
     this.onMouseMove(event);
-    this.events.emit('mousedown', this);
+    this.events.emit('mousedown', this, event.which);
   }
 
   onMouseClick(event)
   {
     this.onMouseMove(event);
-    this.events.emit('mouseclick', this);
+    this.events.emit('mouseclick', this, event.which);
   }
 
   onMouseWheel(event)

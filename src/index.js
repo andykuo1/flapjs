@@ -14,10 +14,11 @@ const mouse = new Mouse(canvas, document);
 const machine = new StateMachine();
 
 //Setup input
-mouse.events.on('mousedown', function(mouse) {
+mouse.events.on('mousedown', function(mouse, button) {
+  if (button === 3)
   machine.markTarget(mouse.x, mouse.y);
 });
-mouse.events.on('mouseup', function(mouse) {
+mouse.events.on('mouseup', function(mouse, button) {
   machine.releaseTarget(mouse.x, mouse.y);
 });
 
@@ -157,6 +158,7 @@ class StateMachine
     const FONT = ctx.font = "12px Arial";
     const TEXTALIGN = ctx.textAlign= "center";
 
+    //Draw initial state marker
     if (this.states.length > 0)
     {
       const initState = this.states[0];
