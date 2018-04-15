@@ -1,5 +1,8 @@
 import Mouse from 'Mouse.js';
 
+const HALF_PI = Math.PI / 2.0;
+const PI2 = Math.PI * 2.0;
+
 const STATE_RADIUS = 16;
 const STATE_RADIUS_INNER = 12;
 const STATE_RADIUS_SQU = STATE_RADIUS * STATE_RADIUS;
@@ -42,7 +45,7 @@ function onAnimationFrame(time)
 {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   machine.onUpdate();
-  machine.onRender();
+  machine.onRender(ctx);
   window.requestAnimationFrame(onAnimationFrame);
 }
 
@@ -54,6 +57,7 @@ class StateMachine
     this.targetDestination = null;
 
     this.states = [];
+    this.transitions = [];
     this.nextAvailableStateID = 0;
   }
 
@@ -69,9 +73,14 @@ class StateMachine
     return state;
   }
 
-  toggleAcceptState(state)
+  createNewTransition(src, dst)
   {
-    state.accept = !state.accept;
+    const transition = {
+      source: src,
+      destination: dst
+    };
+    this.transitions.push(transition);
+    return transition;
   }
 
   makeInitialState(state)
@@ -80,10 +89,15 @@ class StateMachine
     this.states.unshift(state);
   }
 
+  toggleAcceptState(state)
+  {
+    state.accept = !state.accept;
+  }
+
   markTarget(x, y)
   {
     this.targetSource = this.getStateByPosition(x, y);
-    this.isSelfTargeting = true;
+    this.isSelfMode = true;
   }
 
   releaseTarget(x, y)
@@ -91,9 +105,9 @@ class StateMachine
     if (this.targetSource === null) return;
 
     const target = this.getStateByPosition(x, y);
-    if (!this.isSelfTargeting && this.targetDestination !== null)
+    if (!this.isSelfMode && this.targetDestination !== null)
     {
-      //Make a connection between source and destination
+      this.createNewTransition(this.targetSource, this.targetDestination);
     }
     else if (target === this.targetSource)
     {
@@ -124,19 +138,19 @@ class StateMachine
     if (this.targetSource !== null)
     {
       const state = this.getStateByPosition(mouse.x, mouse.y);
-      if (this.isSelfTargeting && state !== this.targetSource)
+      if (this.isSelfMode && state !== this.targetSource)
       {
-        this.isSelfTargeting = false;
+        this.isSelfMode = false;
       }
 
-      if (!this.isSelfTargeting)
+      if (!this.isSelfMode)
       {
         this.targetDestination = state;
       }
     }
   }
 
-  onRender()
+  onRender(ctx)
   {
     const FILL = ctx.fillStyle = "yellow";
     const STROKE = ctx.strokeStyle = "black";
@@ -157,20 +171,21 @@ class StateMachine
       ctx.stroke();
     }
 
+    //Draw states
     for(const state of this.states)
     {
       const x = state.x;
       const y = state.y;
 
       ctx.beginPath();
-      ctx.arc(x, y, STATE_RADIUS, 0, 2 * Math.PI);
+      ctx.arc(x, y, STATE_RADIUS, 0, PI2);
       ctx.fill();
       ctx.stroke();
 
       if (state.accept)
       {
         ctx.beginPath();
-        ctx.arc(x, y, STATE_RADIUS_INNER, 0, 2 * Math.PI);
+        ctx.arc(x, y, STATE_RADIUS_INNER, 0, PI2);
         ctx.stroke();
       }
 
@@ -179,23 +194,60 @@ class StateMachine
       ctx.fillStyle = FILL;
     }
 
-    //Draw arrows
-    if (this.targetSource !== null && !this.isSelfTargeting)
+    //Draw transitions
+    for(const transition of this.transitions)
     {
-      const fromx = this.targetSource.x;
-      const fromy = this.targetSource.y;
-      const tox = this.targetDestination === null ? mouse.x : this.targetDestination.x;
-      const toy = this.targetDestination === null ? mouse.y : this.targetDestination.y;
-      const headLength = 8;
-      const angle = Math.atan2(toy - fromy, tox - fromx);
+      drawTransition(ctx, transition.source, transition.destination);
+    }
 
-      ctx.beginPath();
-      ctx.moveTo(fromx, fromy);
-      ctx.lineTo(tox, toy);
-      ctx.lineTo(tox - headLength * Math.cos(angle - Math.PI / 6.0), toy - headLength * Math.sin(angle - Math.PI /  6.0));
-      ctx.moveTo(tox, toy);
-      ctx.lineTo(tox - headLength * Math.cos(angle + Math.PI / 6.0), toy - headLength * Math.sin(angle + Math.PI /  6.0));
-      ctx.stroke();
+    //Draw arrows
+    if (this.targetSource !== null && !this.isSelfMode)
+    {
+      drawTransition(ctx, this.targetSource, this.targetDestination === null ? mouse : this.targetDestination);
     }
   }
+}
+
+function drawTransition(ctx, src, dst)
+{
+  const dx = src.x - dst.x;
+  const dy = src.y - dst.y;
+  const angle = -Math.atan2(dy, dx) - HALF_PI;
+  const xx = STATE_RADIUS * Math.sin(angle);
+  const yy = STATE_RADIUS * Math.cos(angle);
+  if (dst instanceof Mouse)
+  {
+    drawArrow(ctx, src.x + xx, src.y + yy, dst.x, dst.y);
+  }
+  else if (src === dst)
+  {
+    ctx.beginPath();
+    ctx.arc(src.x + STATE_RADIUS_INNER * 4.0 / 3.0, src.y - STATE_RADIUS_INNER * 4.0 / 3.0, STATE_RADIUS_INNER, Math.PI, Math.PI/2);
+    //pathArrowHead(ctx, tox, toy, headLength, angle);
+    ctx.stroke();
+  }
+  else
+  {
+    drawArrow(ctx, src.x + xx, src.y + yy, dst.x - xx, dst.y - yy);
+  }
+}
+
+function drawArrow(ctx, fromx, fromy, tox, toy)
+{
+  const headLength = 8;
+  const angle = Math.atan2(toy - fromy, tox - fromx);
+
+  ctx.beginPath();
+  ctx.moveTo(fromx, fromy);
+  ctx.lineTo(tox, toy);
+  pathArrowHead(ctx, tox, toy, headLength, angle);
+  ctx.stroke();
+}
+
+function pathArrowHead(ctx, x, y, headLength, angle)
+{
+  ctx.moveTo(x, y);
+  ctx.lineTo(x - headLength * Math.cos(angle - Math.PI / 6.0), y - headLength * Math.sin(angle - Math.PI /  6.0));
+  ctx.moveTo(x, y);
+  ctx.lineTo(x - headLength * Math.cos(angle + Math.PI / 6.0), y - headLength * Math.sin(angle + Math.PI /  6.0));
 }
