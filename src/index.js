@@ -18,6 +18,7 @@ mouse.events.on('mousedown', function(mouse, button) {
   if (button === 3)
   {
     //Move target?
+    machine.startMove(mouse.x, mouse.y);
   }
   else
   {
@@ -28,6 +29,7 @@ mouse.events.on('mouseup', function(mouse, button) {
   if (button === 3)
   {
     //Finish moving target?
+    machine.endMove(mouse.x, mouse.y);
   }
   else
   {
@@ -59,7 +61,7 @@ function onAnimationFrame(time)
 {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   machine.onUpdate(time);
-  machine.onRender(ctx);
+  machine.onRender(ctx, time);
   window.requestAnimationFrame(onAnimationFrame);
 }
 
@@ -69,6 +71,8 @@ class StateMachine
   {
     this.targetSource = null;
     this.targetDestination = null;
+
+    this.moveTarget = null;
 
     this.states = [];
     this.transitions = [];
@@ -136,6 +140,21 @@ class StateMachine
     this.targetDestination = null;
   }
 
+  startMove(x, y)
+  {
+    this.moveTarget = this.getStateByPosition(x, y);
+  }
+
+  endMove(x, y)
+  {
+    if (this.moveTarget !== null)
+    {
+      this.moveTarget.nextX = x;
+      this.moveTarget.nextY = y;
+    }
+    this.moveTarget = null;
+  }
+
   getStateByPosition(x, y)
   {
     for(const state of this.states)
@@ -191,17 +210,19 @@ class StateMachine
     {
       state.x += (state.nextX - state.x) * 0.06;
       state.y += (state.nextY - state.y) * 0.06;
-      if (Math.abs(state.x - state.nextX) < 0.001) state.nextX = Math.random() * canvas.width;
-      if (Math.abs(state.y - state.nextY) < 0.001) state.nextY = Math.random() * canvas.height;
+      if (Math.abs(state.x - state.nextX) < 0.001) state.nextX = state.x;
+      if (Math.abs(state.y - state.nextY) < 0.001) state.nextY = state.y;
     }
   }
 
-  onRender(ctx)
+  onRender(ctx, dt)
   {
     const FILL = ctx.fillStyle = "yellow";
     const STROKE = ctx.strokeStyle = "black";
     const FONT = ctx.font = "12px Arial";
     const TEXTALIGN = ctx.textAlign= "center";
+    const DASHSPACE = [6, 4];
+    const ROTFACTOR = 1000;
 
     //Draw initial state marker
     if (this.states.length > 0)
@@ -247,20 +268,21 @@ class StateMachine
       drawTransition(ctx, transition.source, transition.destination);
     }
 
-    //Draw arrows
+    //Draw user interactions
     if (this.targetSource !== null && !this.isSelfMode)
     {
       drawTransition(ctx, this.targetSource, this.targetDestination === null ? mouse : this.targetDestination);
     }
-  }
-}
-
-function resolveCollisions(states)
-{
-  const collisions = [];
-  for(const state of this.states)
-  {
-    //Implement collision response
+    if (this.moveTarget !== null)
+    {
+      const angle = (dt / ROTFACTOR) % PI2;
+      ctx.save();
+      ctx.beginPath();
+      ctx.setLineDash(DASHSPACE);
+      ctx.arc(mouse.x, mouse.y, STATE_RADIUS, 0 + angle, PI2 + angle);
+      ctx.stroke();
+      ctx.restore();
+    }
   }
 }
 
