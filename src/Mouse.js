@@ -109,4 +109,7 @@ class Mouse
   }
 }
 
+Mouse.BUTTON_LEFT = 1;
+Mouse.BUTTON_RIGHT = 3;
+
 export default Mouse;

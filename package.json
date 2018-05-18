@@ -2,10 +2,10 @@
   "name": "flapjs",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "./build/bundle.js",
   "scripts": {
     "build": "webpack --config webpack.config.js",
-    "test": "clear && npm run build"
+    "test": "clear && npm run build && open ./index.html"
   },
   "keywords": [],
   "author": "Andrew Kuo",
