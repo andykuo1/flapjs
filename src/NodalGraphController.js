@@ -5,9 +5,11 @@ const RADIUS_SQU = RADIUS * RADIUS;
 const PI2 = Math.PI * 2;
 const EDGE_RADIUS = 16;
 const EDGE_RADIUS_SQU = EDGE_RADIUS * EDGE_RADIUS;
+const SELF_LOOP_HEIGHT = 32;
 
 const STROKE = "black";
 const DASHSPACE = [6, 4];
+const DASHCOLOR = "rgba(0,0,0,0.6)";
 const ROTFACTOR = 0.01;
 
 class NodalGraphController
@@ -82,7 +84,7 @@ class NodalGraphController
       this.selectEdge.to = this.targetDestination || this.mouse;
       if (this.targetSource == this.targetDestination)
       {
-        this.selectEdge.y = this.selectEdge.from.y - 32;
+        this.selectEdge.y = this.selectEdge.from.y - SELF_LOOP_HEIGHT;
       }
       else
       {
@@ -103,7 +105,7 @@ class NodalGraphController
     {
       const angle = this.selectorAngle = (this.selectorAngle + (dt * ROTFACTOR)) % PI2;
       const prevLineWidth = ctx.lineWidth;
-      ctx.strokeStyle = "rgba(0,0,0,0.6)";
+      ctx.strokeStyle = DASHCOLOR;
       ctx.lineWidth = 2;
       ctx.save();
       ctx.beginPath();

@@ -6,6 +6,7 @@ const HALF_PI = Math.PI / 2.0;
 const FOURTH_PI = Math.PI / 4.0;
 const SIXTH_PI = Math.PI / 6.0;
 const ARROW_WIDTH = 8;
+const SELF_LOOP_HEIGHT = 32;
 
 export class NodalGraph
 {
@@ -31,7 +32,7 @@ export class NodalGraph
   createNewEdge(from, to)
   {
     const result = new Edge(from, to);
-    if (from == to) result.y = from.y - 32;
+    if (from == to) result.y = from.y - SELF_LOOP_HEIGHT;
     this.edges.push(result);
     return result;
   }
@@ -241,9 +242,11 @@ export class Edge
 
     if (this.label.length > 0)
     {
+      let xx = this.quad == null ? this.centerX : this.x;
+      let yy = this.quad == null ? this.centerY : this.y + (8 * Math.sign(this.quad.y));
       const cx = this.label.length * 3;
-      ctx.clearRect(this.x - cx - 2, this.y - 6, (cx * 2) + 4, 12);
-      ctx.fillText(this.label, this.x, this.y + 4);
+      ctx.clearRect(xx - cx - 2, yy - 5, (cx * 2) + 4, 10);
+      ctx.fillText(this.label, xx, yy + 4);
     }
   }
 }
