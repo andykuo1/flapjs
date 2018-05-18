@@ -36,6 +36,13 @@ export class NodalGraph
 
   draw(ctx, dt)
   {
+    //Draw other nodes
+    for(let node of this.nodes)
+    {
+      node.update(dt);
+      node.draw(ctx);
+    }
+    
     //Draw initial node
     if (this.nodes.length > 0)
     {
@@ -50,13 +57,6 @@ export class NodalGraph
       ctx.lineTo(x - DIAMETER, y + RADIUS);
       ctx.closePath();
       ctx.stroke();
-    }
-
-    //Draw other nodes
-    for(let node of this.nodes)
-    {
-      node.update(dt);
-      node.draw(ctx);
     }
 
     //Draw edges

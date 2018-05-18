@@ -1,12 +1,12 @@
 const RADIUS = 16;
 const RADIUS_SQU = RADIUS * RADIUS;
 const PI2 = Math.PI * 2;
-const EDGE_RADIUS = 4;
+const EDGE_RADIUS = 16;
 const EDGE_RADIUS_SQU = EDGE_RADIUS * EDGE_RADIUS;
 
 const STROKE = "black";
 const DASHSPACE = [6, 4];
-const ROTFACTOR = 1;
+const ROTFACTOR = 0.01;
 
 class NodalGraphController
 {
@@ -58,17 +58,18 @@ class NodalGraphController
 
   draw(ctx, dt)
   {
-    if (this.targetSource !== null)
+    let selectState = this.getStateByPosition(this.mouse.x, this.mouse.y);
+
+    if (this.targetSource != null)
     {
-      const state = this.getStateByPosition(this.mouse.x, this.mouse.y);
-      if (this.isSelfMode && state !== this.targetSource)
+      if (this.isSelfMode && selectState != this.targetSource)
       {
         this.isSelfMode = false;
       }
 
       if (!this.isSelfMode)
       {
-        this.targetDestination = state;
+        this.targetDestination = selectState;
       }
     }
 
@@ -86,17 +87,23 @@ class NodalGraphController
     {
       this.moveTarget.x = this.mouse.x;
       this.moveTarget.y = this.mouse.y;
+      selectState = this.moveTarget;
+    }
 
-      /*
-      ctx.strokeStyle = "black";
+    if (selectState == null) selectState = this.getEdgeByPosition(this.mouse.x, this.mouse.y);
+    if (selectState != null)
+    {
       const angle = this.selectorAngle = (this.selectorAngle + (dt * ROTFACTOR)) % PI2;
+      const prevLineWidth = ctx.lineWidth;
+      ctx.strokeStyle = "rgba(0,0,0,0.6)";
+      ctx.lineWidth = 2;
       ctx.save();
       ctx.beginPath();
       ctx.setLineDash(DASHSPACE);
-      ctx.arc(this.mouse.x, this.mouse.y, RADIUS, 0 + angle, PI2 + angle);
+      ctx.arc(selectState.x, selectState.y, RADIUS + 4, 0 + angle, PI2 + angle);
       ctx.stroke();
       ctx.restore();
-      */
+      ctx.lineWidth = prevLineWidth;
     }
   }
 
