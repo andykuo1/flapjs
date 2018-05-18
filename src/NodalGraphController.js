@@ -1,3 +1,5 @@
+import { Edge } from 'NodalGraph.js';
+
 const RADIUS = 16;
 const RADIUS_SQU = RADIUS * RADIUS;
 const PI2 = Math.PI * 2;
@@ -21,6 +23,7 @@ class NodalGraphController
 
     this.moveTarget = null;
     this.selectorAngle = 0;
+    this.selectEdge = new Edge(null, null, "");
   }
 
   load()
@@ -83,7 +86,14 @@ class NodalGraphController
     }
     */
 
-    if (this.moveTarget !== null)
+    if (this.targetSource != null && !this.isSelfMode)
+    {
+      this.selectEdge.from = this.targetSource;
+      this.selectEdge.to = this.targetDestination || this.mouse;
+      this.selectEdge.draw(ctx);
+    }
+
+    if (this.moveTarget != null)
     {
       this.moveTarget.x = this.mouse.x;
       this.moveTarget.y = this.mouse.y;

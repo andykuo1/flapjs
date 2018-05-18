@@ -42,7 +42,7 @@ export class NodalGraph
       node.update(dt);
       node.draw(ctx);
     }
-    
+
     //Draw initial node
     if (this.nodes.length > 0)
     {
@@ -172,35 +172,58 @@ export class Edge
 
   draw(ctx)
   {
-    const dx = this.from.x - this.to.x;//TODO: Apply quad to this
-    const dy = this.from.y - this.to.y;
-    const angle = -Math.atan2(dy, dx) - HALF_PI;
-    const xx = RADIUS * Math.sin(angle);
-    const yy = RADIUS * Math.cos(angle);
-
     ctx.font = "12px Arial";
-    ctx.textAlign= "center";
+    ctx.textAlign = "center";
     ctx.strokeStyle = "black";
+    ctx.fillStyle = "black";
 
-    const startX = this.from.x + xx;
-    const startY = this.from.y + yy;
-    const endX = this.to.x - xx;
-    const endY = this.to.y - yy;
+    let endX = 0;
+    let endY = 0;
     let arrowAngle = 0;
-
-    ctx.beginPath();
-    ctx.moveTo(startX, startY);
 
     if (this.quad == null)
     {
+      const dx = this.from.x - this.to.x;//TODO: Apply quad to this
+      const dy = this.from.y - this.to.y;
+      const angle = -Math.atan2(dy, dx) - HALF_PI;
+      const xx = RADIUS * Math.sin(angle);
+      const yy = RADIUS * Math.cos(angle);
+
+      const startX = this.from.x + xx;
+      const startY = this.from.y + yy;
+      endX = this.to.x - (this.to instanceof Node ? xx : 0);
+      endY = this.to.y - (this.to instanceof Node ? yy : 0);
       arrowAngle = Math.atan2(startX - endX, startY - endY) + Math.PI;
+
+      ctx.beginPath();
+      ctx.moveTo(startX, startY);
       ctx.lineTo(endX, endY);
     }
     else
     {
       const quadX = this.centerX + (this.quad.x * 2);
       const quadY = this.centerY + (this.quad.y * 2);
+
+      const sdx = this.from.x - quadX;
+      const sdy = this.from.y - quadY;
+      const sangle = -Math.atan2(sdy, sdx) - HALF_PI;
+      const sx = RADIUS * Math.sin(sangle);
+      const sy = RADIUS * Math.cos(sangle);
+
+      const edx = quadX - this.to.x;
+      const edy = quadY - this.to.y;
+      const eangle = -Math.atan2(edy, edx) - HALF_PI;
+      const ex = RADIUS * Math.sin(eangle);
+      const ey = RADIUS * Math.cos(eangle);
+
+      const startX = this.from.x + sx;
+      const startY = this.from.y + sy;
+      endX = this.to.x - ex;
+      endY = this.to.y - ey;
       arrowAngle = Math.atan2(quadX - endX, quadY - endY) + Math.PI;
+
+      ctx.beginPath();
+      ctx.moveTo(startX, startY);
       ctx.quadraticCurveTo(quadX, quadY, endX, endY);
     }
 
@@ -214,10 +237,12 @@ export class Edge
     ctx.stroke();
     ctx.closePath();
 
-    const cx = this.label.length * 3;
-    ctx.clearRect(this.x - cx - 2, this.y - 6, (cx * 2) + 4, 12);
-    ctx.fillStyle = "black";
-    ctx.fillText(this.label, this.x, this.y + 4);
+    if (this.label.length > 0)
+    {
+      const cx = this.label.length * 3;
+      ctx.clearRect(this.x - cx - 2, this.y - 6, (cx * 2) + 4, 12);
+      ctx.fillText(this.label, this.x, this.y + 4);
+    }
   }
 }
 
