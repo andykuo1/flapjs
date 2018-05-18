@@ -76,20 +76,18 @@ class NodalGraphController
       }
     }
 
-    /*
-    for(const node of this.graph.nodes)
-    {
-      node.x += (node.nextX - node.x) * 0.06;
-      node.y += (node.nextY - node.y) * 0.06;
-      if (Math.abs(node.x - node.nextX) < 0.001) node.nextX = node.x;
-      if (Math.abs(node.y - node.nextY) < 0.001) node.nextY = node.y;
-    }
-    */
-
     if (this.targetSource != null && !this.isSelfMode)
     {
       this.selectEdge.from = this.targetSource;
       this.selectEdge.to = this.targetDestination || this.mouse;
+      if (this.targetSource == this.targetDestination)
+      {
+        this.selectEdge.y = this.selectEdge.from.y - 32;
+      }
+      else
+      {
+        this.selectEdge.quad = null;
+      }
       this.selectEdge.draw(ctx);
     }
 
@@ -143,14 +141,14 @@ class NodalGraphController
 
   releaseTarget(x, y)
   {
-    if (this.targetSource === null) return;
+    if (this.targetSource == null) return;
 
     const target = this.getStateByPosition(x, y);
-    if (!this.isSelfMode && this.targetDestination !== null)
+    if (!this.isSelfMode && this.targetDestination != null)
     {
       this.createNewTransition(this.targetSource, this.targetDestination);
     }
-    else if (target === this.targetSource)
+    else if (target == this.targetSource)
     {
       this.graph.toggleAcceptState(target);
     }
@@ -161,11 +159,7 @@ class NodalGraphController
 
   startMove(x, y)
   {
-    this.moveTarget = this.getStateByPosition(x, y);
-    if (this.moveTarget == null)
-    {
-      this.moveTarget = this.getEdgeByPosition(x, y);
-    }
+    this.moveTarget = this.getEdgeByPosition(x, y) || this.getStateByPosition(x, y);
   }
 
   endMove(x, y)

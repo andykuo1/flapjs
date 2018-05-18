@@ -3,6 +3,7 @@ const DIAMETER = RADIUS * 2;
 const RADIUS_INNER = 12;
 const PI2 = Math.PI * 2;
 const HALF_PI = Math.PI / 2.0;
+const FOURTH_PI = Math.PI / 4.0;
 const SIXTH_PI = Math.PI / 6.0;
 const ARROW_WIDTH = 8;
 
@@ -30,6 +31,7 @@ export class NodalGraph
   createNewEdge(from, to)
   {
     const result = new Edge(from, to);
+    if (from == to) result.y = from.y - 32;
     this.edges.push(result);
     return result;
   }
@@ -206,20 +208,20 @@ export class Edge
 
       const sdx = this.from.x - quadX;
       const sdy = this.from.y - quadY;
-      const sangle = -Math.atan2(sdy, sdx) - HALF_PI;
+      const sangle = -Math.atan2(sdy, sdx) - HALF_PI + (this.from == this.to ? FOURTH_PI : 0);
       const sx = RADIUS * Math.sin(sangle);
       const sy = RADIUS * Math.cos(sangle);
 
       const edx = quadX - this.to.x;
       const edy = quadY - this.to.y;
-      const eangle = -Math.atan2(edy, edx) - HALF_PI;
+      const eangle = -Math.atan2(edy, edx) - HALF_PI + (this.from == this.to ? -FOURTH_PI : 0);
       const ex = RADIUS * Math.sin(eangle);
       const ey = RADIUS * Math.cos(eangle);
 
       const startX = this.from.x + sx;
       const startY = this.from.y + sy;
-      endX = this.to.x - ex;
-      endY = this.to.y - ey;
+      endX = this.to.x - (this.to instanceof Node ? ex : 0);
+      endY = this.to.y - (this.to instanceof Node ? ey : 0);
       arrowAngle = Math.atan2(quadX - endX, quadY - endY) + Math.PI;
 
       ctx.beginPath();
