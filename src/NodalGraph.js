@@ -2,20 +2,27 @@ const RADIUS = 16;
 const DIAMETER = RADIUS * 2;
 const RADIUS_INNER = 12;
 const PI2 = Math.PI * 2;
+const HALF_PI = Math.PI / 2.0;
 const SIXTH_PI = Math.PI / 6.0;
 const ARROW_WIDTH = 8;
 
 export class NodalGraph
 {
-  constructor()
+  constructor(canvas)
   {
     this.nodes = [];
     this.edges = [];
+
+    this.canvas = canvas;
   }
+
+  get centerX() { return this.canvas.width / 2; }
+
+  get centerY() { return this.canvas.height / 2; }
 
   createNewNode()
   {
-    const result = new Node();
+    const result = new Node(this.centerX, this.centerY);
     this.nodes.push(result);
     return result;
   }
@@ -32,9 +39,11 @@ export class NodalGraph
     //Draw initial node
     if (this.nodes.length > 0)
     {
-      const initial = this.nodes[0];
+      const initial = this.getInitialState();
       const x = initial.x;
       const y = initial.y;
+
+      ctx.strokeStyle = "black";
       ctx.beginPath();
       ctx.moveTo(x - RADIUS, y);
       ctx.lineTo(x - DIAMETER, y - RADIUS);
@@ -104,6 +113,7 @@ export class Node
   {
     ctx.font = "12px Arial";
     ctx.textAlign= "center";
+    ctx.strokeStyle = "black";
     ctx.fillStyle = "yellow";
 
     ctx.beginPath();
@@ -134,19 +144,48 @@ export class Edge
     this.quad = null;
   }
 
-  get x() { return this.from.x + (this.to.x - this.from.x) / 2; }
-  get y() { return this.from.y + (this.to.y - this.from.y) / 2; }
+  get centerX() { return this.from.x + (this.to.x - this.from.x) / 2; }
+  get centerY() { return this.from.y + (this.to.y - this.from.y) / 2; }
+
+  get x() {
+    const cx = this.centerX;
+    return this.quad != null ? this.quad.x + cx : cx;
+  }
+  get y() {
+    const cy = this.centerY;
+    return this.quad != null ? this.quad.y + cy : cy;
+  }
+
+  set x(value) {
+    if (this.quad == null) this.quad = {x: 0, y: 0};
+    this.quad.x = value - this.centerX;
+    if (Math.abs(this.quad.x) < 8) this.quad.x = 0;
+    if (this.quad.x == 0 && this.quad.y == 0) this.quad = null;
+  }
+
+  set y(value) {
+    if (this.quad == null) this.quad = {x: 0, y: 0};
+    this.quad.y = value - this.centerY;
+    if (Math.abs(this.quad.y) < 8) this.quad.y = 0;
+    if (this.quad.x == 0 && this.quad.y == 0) this.quad = null;
+  }
 
   draw(ctx)
   {
+    const dx = this.from.x - this.to.x;//TODO: Apply quad to this
+    const dy = this.from.y - this.to.y;
+    const angle = -Math.atan2(dy, dx) - HALF_PI;
+    const xx = RADIUS * Math.sin(angle);
+    const yy = RADIUS * Math.cos(angle);
+
     ctx.font = "12px Arial";
     ctx.textAlign= "center";
-    ctx.fillStyle = "black";
+    ctx.strokeStyle = "black";
 
-    const startX = this.from.x;
-    const startY = this.from.y;
-    const endX = this.to.x;
-    const endY = this.to.y;
+    const startX = this.from.x + xx;
+    const startY = this.from.y + yy;
+    const endX = this.to.x - xx;
+    const endY = this.to.y - yy;
     let arrowAngle = 0;
 
     ctx.beginPath();
@@ -159,8 +198,8 @@ export class Edge
     }
     else
     {
-      const quadX = this.quad.x;
-      const quadY = this.quad.y;
+      const quadX = this.centerX + (this.quad.x * 2);
+      const quadY = this.centerY + (this.quad.y * 2);
       arrowAngle = Math.atan2(quadX - endX, quadY - endY) + Math.PI;
       ctx.quadraticCurveTo(quadX, quadY, endX, endY);
     }

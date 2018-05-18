@@ -1,6 +1,8 @@
 const RADIUS = 16;
-const RADIUS_SQU = 256;
+const RADIUS_SQU = RADIUS * RADIUS;
 const PI2 = Math.PI * 2;
+const EDGE_RADIUS = 4;
+const EDGE_RADIUS_SQU = EDGE_RADIUS * EDGE_RADIUS;
 
 const STROKE = "black";
 const DASHSPACE = [6, 4];
@@ -82,6 +84,10 @@ class NodalGraphController
 
     if (this.moveTarget !== null)
     {
+      this.moveTarget.x = this.mouse.x;
+      this.moveTarget.y = this.mouse.y;
+
+      /*
       ctx.strokeStyle = "black";
       const angle = this.selectorAngle = (this.selectorAngle + (dt * ROTFACTOR)) % PI2;
       ctx.save();
@@ -90,6 +96,7 @@ class NodalGraphController
       ctx.arc(this.mouse.x, this.mouse.y, RADIUS, 0 + angle, PI2 + angle);
       ctx.stroke();
       ctx.restore();
+      */
     }
   }
 
@@ -138,11 +145,15 @@ class NodalGraphController
   startMove(x, y)
   {
     this.moveTarget = this.getStateByPosition(x, y);
+    if (this.moveTarget == null)
+    {
+      this.moveTarget = this.getEdgeByPosition(x, y);
+    }
   }
 
   endMove(x, y)
   {
-    if (this.moveTarget !== null)
+    if (this.moveTarget != null)
     {
       this.moveTarget.x = x;
       this.moveTarget.y = y;
@@ -159,6 +170,21 @@ class NodalGraphController
       if (dx * dx + dy * dy < RADIUS_SQU)
       {
         return node;
+      }
+    }
+
+    return null;
+  }
+
+  getEdgeByPosition(x, y)
+  {
+    for(const edge of this.graph.edges)
+    {
+      const dx = x - edge.x;
+      const dy = y - edge.y;
+      if (dx * dx + dy * dy < EDGE_RADIUS_SQU)
+      {
+        return edge;
       }
     }
 

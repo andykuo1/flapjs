@@ -24,11 +24,26 @@ function onAnimationFrame(time)
 
 import NodalGraphController from 'NodalGraphController.js';
 import { NodalGraph } from 'NodalGraph.js';
-const graph = new NodalGraph();
+const graph = new NodalGraph(canvas);
 const controller = new NodalGraphController(canvas, mouse, graph);
 
 function onCanvasLoad()
 {
+  let node = null;
+  let node2 = null;
+  let edge = null;
+
+  node = graph.createNewNode();
+  node.x = canvas.width / 2 - 64;
+  node.y = canvas.height / 2;
+  node.label = "q0";
+  node2 = graph.createNewNode();
+  node2.x = canvas.width / 2 + 64;
+  node2.y = canvas.height / 2;
+  node2.label = "q1";
+  edge = graph.createNewEdge(node, node2);
+  edge.label = "abc";
+
   controller.load();
 }
 
