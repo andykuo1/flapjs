@@ -32,8 +32,12 @@ function onCanvasLoad()
   controller.load();
 }
 
+let avgFramesPerSecond = 60;
+let prevTime = 0;
 function onCanvasDraw(ctx, time)
 {
-  graph.draw(ctx);
-  controller.draw(ctx, time);
+  const dt = (time - prevTime) / avgFramesPerSecond;
+  graph.draw(ctx, dt);
+  controller.draw(ctx, dt);
+  prevTime = time;
 }

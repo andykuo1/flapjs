@@ -4,7 +4,7 @@ const PI2 = Math.PI * 2;
 
 const STROKE = "black";
 const DASHSPACE = [6, 4];
-const ROTFACTOR = 1000;
+const ROTFACTOR = 1;
 
 class NodalGraphController
 {
@@ -18,6 +18,7 @@ class NodalGraphController
     this.targetDestination = null;
 
     this.moveTarget = null;
+    this.selectorAngle = 0;
   }
 
   load()
@@ -53,7 +54,7 @@ class NodalGraphController
     });
   }
 
-  draw(ctx, time)
+  draw(ctx, dt)
   {
     if (this.targetSource !== null)
     {
@@ -82,7 +83,7 @@ class NodalGraphController
     if (this.moveTarget !== null)
     {
       ctx.strokeStyle = "black";
-      const angle = (time / ROTFACTOR) % PI2;
+      const angle = this.selectorAngle = (this.selectorAngle + (dt * ROTFACTOR)) % PI2;
       ctx.save();
       ctx.beginPath();
       ctx.setLineDash(DASHSPACE);
@@ -99,8 +100,6 @@ class NodalGraphController
     const node = this.graph.createNewNode();
     node.x = x;
     node.y = y;
-    //node.nextX = x;
-    //node.nextY = y;
     node.accept = false;
     return node;
   }
@@ -147,8 +146,6 @@ class NodalGraphController
     {
       this.moveTarget.x = x;
       this.moveTarget.y = y;
-      //this.moveTarget.nextX = x;
-      //this.moveTarget.nextY = y;
     }
     this.moveTarget = null;
   }

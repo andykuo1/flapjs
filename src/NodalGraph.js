@@ -1,6 +1,9 @@
 const RADIUS = 16;
+const DIAMETER = RADIUS * 2;
 const RADIUS_INNER = 12;
 const PI2 = Math.PI * 2;
+const SIXTH_PI = Math.PI / 6.0;
+const ARROW_WIDTH = 8;
 
 export class NodalGraph
 {
@@ -24,7 +27,7 @@ export class NodalGraph
     return result;
   }
 
-  draw(ctx)
+  draw(ctx, dt)
   {
     //Draw initial node
     if (this.nodes.length > 0)
@@ -34,8 +37,8 @@ export class NodalGraph
       const y = initial.y;
       ctx.beginPath();
       ctx.moveTo(x - RADIUS, y);
-      ctx.lineTo(x - RADIUS * 2, y - RADIUS);
-      ctx.lineTo(x - RADIUS * 2, y + RADIUS);
+      ctx.lineTo(x - DIAMETER, y - RADIUS);
+      ctx.lineTo(x - DIAMETER, y + RADIUS);
       ctx.closePath();
       ctx.stroke();
     }
@@ -43,6 +46,7 @@ export class NodalGraph
     //Draw other nodes
     for(let node of this.nodes)
     {
+      node.update(dt);
       node.draw(ctx);
     }
 
@@ -77,9 +81,23 @@ export class Node
   constructor(x=0, y=0, label="q")
   {
     this.label = label;
-    this.x = x;
-    this.y = y;
+    this._x = x;
+    this._y = y;
+    this.nextX = x;
+    this.nextY = y;
     this.accept = false;
+  }
+
+  get x() { return this._x; }
+  get y() { return this._y; }
+
+  set x(value) { this.nextX = value; }
+  set y(value) { this.nextY = value; }
+
+  update(dt)
+  {
+    this._x = lerp(this._x, this.nextX, dt);
+    this._y = lerp(this._y, this.nextY, dt);
   }
 
   draw(ctx)
@@ -116,18 +134,19 @@ export class Edge
     this.quad = null;
   }
 
+  get x() { return this.from.x + (this.to.x - this.from.x) / 2; }
+  get y() { return this.from.y + (this.to.y - this.from.y) / 2; }
+
   draw(ctx)
   {
     ctx.font = "12px Arial";
     ctx.textAlign= "center";
     ctx.fillStyle = "black";
 
-    const SIXTH_PI = Math.PI / 6.0;
     const startX = this.from.x;
     const startY = this.from.y;
     const endX = this.to.x;
     const endY = this.to.y;
-    const arrowWidth = 8;
     let arrowAngle = 0;
 
     ctx.beginPath();
@@ -147,16 +166,23 @@ export class Edge
     }
 
     ctx.moveTo(
-      endX - (arrowWidth * Math.sin(arrowAngle - SIXTH_PI)),
-      endY - (arrowWidth * Math.cos(arrowAngle - SIXTH_PI)));
+      endX - (ARROW_WIDTH * Math.sin(arrowAngle - SIXTH_PI)),
+      endY - (ARROW_WIDTH * Math.cos(arrowAngle - SIXTH_PI)));
     ctx.lineTo(endX, endY);
     ctx.lineTo(
-      endX - (arrowWidth * Math.sin(arrowAngle + SIXTH_PI)),
-      endY - (arrowWidth * Math.cos(arrowAngle + SIXTH_PI)));
+      endX - (ARROW_WIDTH * Math.sin(arrowAngle + SIXTH_PI)),
+      endY - (ARROW_WIDTH * Math.cos(arrowAngle + SIXTH_PI)));
     ctx.stroke();
     ctx.closePath();
 
+    const cx = this.label.length * 3;
+    ctx.clearRect(this.x - cx - 2, this.y - 6, (cx * 2) + 4, 12);
     ctx.fillStyle = "black";
-    ctx.fillText(this.label, this.x, this.y);
+    ctx.fillText(this.label, this.x, this.y + 4);
   }
+}
+
+function lerp(a, b, dt)
+{
+  return a * (1 - dt) + b * dt;
 }
