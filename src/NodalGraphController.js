@@ -1,6 +1,7 @@
 import { Edge } from 'NodalGraph.js';
 
 const SPAWN_RADIUS = 64;
+const CLICK_RADIUS_SQU = 4;
 
 const RADIUS = 16;
 const RADIUS_SQU = RADIUS * RADIUS;
@@ -24,6 +25,7 @@ class NodalGraphController
 
     this.targetSource = null;
     this.targetDestination = null;
+    this.prevMouse = { x: 0, y: 0 };
 
     this.moveTarget = null;
     this.moveGraph = null;
@@ -43,6 +45,8 @@ class NodalGraphController
       {
         this.markTarget(mouse.x, mouse.y);
       }
+      this.prevMouse.x = mouse.x;
+      this.prevMouse.y = mouse.y;
     });
     this.mouse.events.on('mouseup', (mouse, button) => {
       if (button == 3)
@@ -54,18 +58,25 @@ class NodalGraphController
       {
         this.releaseTarget(mouse.x, mouse.y);
       }
+      this.prevMouse.x = mouse.x;
+      this.prevMouse.y = mouse.y;
     });
 
     //Setup buttons
-    const buttonNewState = document.getElementById("newstate");
+    const buttonNewState = document.getElementById("new_state");
     buttonNewState.addEventListener('click', (event) => {
       //Create new state
       this.createNewState();
     });
-    const buttonClearGraph = document.getElementById("cleargraph");
+    const buttonClearGraph = document.getElementById("clear_graph");
     buttonClearGraph.addEventListener('click', (event) => {
       //Clear graph
       this.graph.clear();
+    });
+    const buttonSimulatePhysics = document.getElementById("simulate_physics");
+    buttonSimulatePhysics.addEventListener('click', (event) => {
+      //Begin to simulate physics for graph...
+      this.graph._simulatePhysics = true;
     });
   }
 
@@ -96,6 +107,7 @@ class NodalGraphController
       {
         this.selectEdge.y = this.selectEdge.from.y - SELF_LOOP_HEIGHT;
       }
+      //TODO: if (this.getEdgesByNodes(this.targetSource, this.targetDestination) != null)
       else
       {
         this.selectEdge.quad = null;
@@ -114,8 +126,8 @@ class NodalGraphController
       }
       else
       {
-        this.moveTarget.x = this.mouse.x - this.graph.x;
-        this.moveTarget.y = this.mouse.y - this.graph.y;
+        this.moveTarget.x = this.mouse.x - this.graph.centerX;
+        this.moveTarget.y = this.mouse.y - this.graph.centerY;
       }
       selectState = this.moveTarget;
     }
@@ -171,7 +183,23 @@ class NodalGraphController
 
   releaseTarget(x, y)
   {
-    if (this.targetSource == null) return;
+    //If did not click on anything...
+    if (this.targetSource == null)
+    {
+      //If click, create node at mouse position...
+      const dx = x - this.prevMouse.x;
+      const dy = y - this.prevMouse.y;
+
+      //Check if it is a click, not a drag...
+      if (dx * dx + dy * dy < CLICK_RADIUS_SQU)
+      {
+        const node = this.graph.createNewNode();
+        node.x = x - this.graph.centerX;
+        node.y = y - this.graph.centerY;
+        node.accept = false;
+      }
+      return;
+    }
 
     const target = this.getStateByPosition(x, y);
     if (!this.isSelfMode && this.targetDestination != null)
@@ -208,8 +236,8 @@ class NodalGraphController
       }
       else
       {
-        this.moveTarget.x = this.mouse.x - this.graph.x;
-        this.moveTarget.y = this.mouse.y - this.graph.y;
+        this.moveTarget.x = this.mouse.x - this.graph.centerX;
+        this.moveTarget.y = this.mouse.y - this.graph.centerY;
       }
 
       this.moveTarget = null;

@@ -27,10 +27,9 @@ export class NodalGraph
     this._offsetY = 0;
     this.nextOffsetX = 0;
     this.nextOffsetY = 0;
-  }
 
-  get x() { return this.centerX; }
-  get y() { return this.centerY; }
+    this._simulatePhysics = false;
+  }
 
   get centerX() { return this.canvas.width / 2 + this._offsetX; }
   get centerY() { return this.canvas.height / 2 + this._offsetY; }
@@ -66,6 +65,28 @@ export class NodalGraph
   {
     this._offsetX = lerp(this._offsetX, this.nextOffsetX, dt);
     this._offsetY = lerp(this._offsetY, this.nextOffsetY, dt);
+
+    //Simulate physics
+    if (this._simulatePhysics)
+    {
+      let flag = false;
+      for(const node of this.nodes)
+      {
+        for(const other of this.nodes)
+        {
+          if (node == other) continue;
+          const dx = node.nextX - other.nextX;
+          const dy = node.nextY - other.nextY;
+          if (dx * dx + dy * dy < PADDING_RADIUS_SQU)
+          {
+            node.nextX += dx * 0.5;
+            node.nextY += dy * 0.5;
+            flag = true;
+          }
+        }
+      }
+      this._simulatePhysics = flag;
+    }
 
     //Draw other nodes
     for(let node of this.nodes)
@@ -140,27 +161,6 @@ export class Node
 
   update(dt)
   {
-    if (this._shouldPhysics || --this._physicsTicks <= 0)
-    {
-      this._physicsTicks = PHYSICS_TICKS;
-      let flag = false;
-      for(const node of this.graph.nodes)
-      {
-        if (node == this) continue;
-        const dx = this.nextX - node.nextX;
-        const dy = this.nextY - node.nextY;
-        if (dx * dx + dy * dy < PADDING_RADIUS_SQU)
-        {
-          node._shouldPhysics = true;
-          this.nextX += dx * 0.5;
-          this.nextY += dy * 0.5;
-          flag = true;
-        }
-      }
-
-      this._shouldPhysics = flag;
-    }
-
     this._x = lerp(this._x, this.nextX, dt);
     this._y = lerp(this._y, this.nextY, dt);
   }

@@ -13,7 +13,7 @@
       <div id="viewport"></div>
       <div class="toolbox">
         <div class="input">
-          <button class="emerald" id="newstate">New State</button>
+          <button class="emerald" id="new_state">New State</button>
         </div>
         <div class="input">
           <input class="input-field">
@@ -23,17 +23,27 @@
         <div class='container'>
           <div class="accordion">
             <div class="accordion__single">
-              <input class="accordion__single__hidden" type="checkbox" id="acc_div1">
-              <label class="accordion__single__question" for="acc_div1">About</label>
+              <input class="accordion__single__hidden" type="checkbox" id="div_about">
+              <label class="accordion__single__question" for="div_about">About</label>
               <p class="accordion__single__answer">
                 "Something here would be nice." -Andrew
+              </p>
+            </div><!-- end .accordion__single -->
+            <div class="accordion__single">
+              <input class="accordion__single__hidden" type="checkbox" id="div_options">
+              <label class="accordion__single__question" for="div_options">Options</label>
+              <p class="accordion__single__answer">
+                <button id="simulate_physics">Simulate Physics</button>
+                <br/>
+                <input class="option" type="checkbox" id="checkbox1">
+                <label>Moo Moo.</label>
               </p>
             </div><!-- end .accordion__single -->
           </div><!-- end .accordion -->
         </div><!-- end .container -->
 
         <div class="input">
-          <button class="ruby" id="cleargraph">Clear Graph</button>
+          <button class="ruby" id="clear_graph">Clear Graph</button>
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 import Mouse from 'Mouse.js';
-const mouse = new Mouse(canvas, document);
+const mouse = new Mouse(canvas, canvas);
 
 //Setup canvas
 window.addEventListener('load', onWindowResize);
