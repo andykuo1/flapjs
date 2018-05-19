@@ -12,9 +12,11 @@
     <div class="content">
       <div id="viewport"></div>
       <div class="toolbox">
+
         <div class="input">
           <button class="emerald" id="new_state">New State</button>
         </div>
+
         <div class="input">
           <input class="input-field">
           <button class="input-item">...</button>
@@ -43,8 +45,13 @@
         </div><!-- end .container -->
 
         <div class="input">
+          <button class="silver" download="flap-machine.png" id="export_image">Export As Image</button>
+        </div>
+
+        <div class="input">
           <button class="ruby" id="clear_graph">Clear Graph</button>
         </div>
+
       </div>
     </div>
 
@@ -56,6 +63,7 @@
     </footer>
 
     <!-- Entry point -->
+    <script src="lib/download.min.js"></script>
     <script src="build/bundle.js"></script>
   </body>
 </html>

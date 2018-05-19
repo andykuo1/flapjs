@@ -10,6 +10,8 @@ const EDGE_RADIUS = 16;
 const EDGE_RADIUS_SQU = EDGE_RADIUS * EDGE_RADIUS;
 const SELF_LOOP_HEIGHT = 32;
 
+const EXPORT_FILE_NAME = "flap-machine.png";
+
 const GRAPH_INFO_COLOR = "lightgray";
 const STROKE = "black";
 const DASHSPACE = [6, 4];
@@ -78,6 +80,12 @@ class NodalGraphController
     buttonSimulatePhysics.addEventListener('click', (event) => {
       //Begin to simulate physics for graph...
       this.graph._simulatePhysics = true;
+    });
+    const buttonExportImage = document.getElementById("export_image");
+    buttonExportImage.addEventListener('click', (event) => {
+      //Export canvas to png image
+      const dataURL = this.canvas.toDataURL("image/png");
+      download(dataURL, EXPORT_FILE_NAME, "image/png");
     });
   }
 
