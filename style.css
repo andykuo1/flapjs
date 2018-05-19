@@ -1,14 +1,182 @@
 html, body {
   width: 100%; height: 100%;
   margin: 0; padding: 0;
-  background-color: #EFEFEF;
   overflow: hidden;
+  background-color: #EFEFEF;
 }
-button {
-  position: absolute;
-  bottom: 0;
-  right: 0;
+
+/* LAYOUT */
+body {
+  display: flex;
+  flex-direction: column;
+}
+header, footer {
+  height: 60px;
+  z-index: 2;
 }
 canvas {
-  margin: 0; padding: 0;
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+.content {
+  display: flex;
+  flex: 1;
+}
+#viewport {
+  visibility: hidden;
+  flex: 1 0;
+  order: -1;
+}
+.toolbox {
+  flex: 0 1 12em;
+  z-index: 1;
+
+  opacity: 1;
+  visibility: visible;
+  transition: visibility 150ms ease 150ms, opacity 150ms;
+}
+
+/* RESPONSIVE LAYOUT */
+@media screen and (max-width: 400px) {
+  .content {
+    flex-direction: column;
+  }
+  .toolbox {
+    flex: 0 1 8em;
+  }
+}
+
+@media (max-height: 212px) {
+  .toolbox {
+    visibility: hidden;
+    opacity: 0;
+  }
+}
+
+/* DECORATION */
+@import url(https://fonts.googleapis.com/css?family=Cardo:400italic);
+h1 {
+  color: #fff;
+  font-family: 'Cardo', serif;
+  font-size: 1.5em;
+  font-weight: normal;
+  font-style: italic;
+  letter-spacing: 0.1em;
+  line-height: 2.2em;
+  text-shadow: 0.07em 0.07em 0 rgba(0, 0, 0, 0.1);
+  margin: 0.5em;
+}
+header {
+  background: tomato;
+}
+footer {
+  background: lightgreen;
+}
+canvas {
+  padding: 0;
+  overflow: hidden;
+}
+.toolbox {
+  padding: 0.5em;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  background: dodgerblue;
+}
+.toolbox > * {
+  margin-bottom: 0.5em;
+}
+.emerald {
+  position: relative;
+  vertical-align: top;
+  width: 100%;
+  height: 40px;
+  padding: 0 10px;
+  font-size: 18px;
+  color: white;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  background: #2ecc71;
+  border: 0;
+  border-bottom: 2px solid #28be68;
+  cursor: pointer;
+  -webkit-box-shadow: inset 0 -2px #28be68;
+  box-shadow: inset 0 -2px #28be68;
+}
+.emerald:active {
+  top: 1px;
+  outline: none;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+/* TOOLBOX */
+.input {
+  display: flex;
+}
+.input-field {
+  flex: 1;
+  padding: 0.5em 0;
+}
+.input-item {
+
+}
+
+/* TEST INPUT */
+.test-input {
+  display: flex;
+  padding: 0.5em;
+}
+.test-field {
+  flex: 1;
+  padding: 0.5em;
+}
+
+/* ACCORDION */
+.accordion__single__hidden {
+  display: none;
+}
+.accordion__single__hidden:checked ~ .accordion__single__answer {
+  max-height: 400px;
+  opacity: 1;
+  -webkit-transform: translate(0, 0);
+          transform: translate(0, 0);
+  margin-top: 14px;
+}
+.accordion__single__hidden:checked ~ .accordion__single__question:after {
+  content: '-';
+}
+.accordion__single__answer {
+  margin-top: 0;
+  max-height: 0;
+  opacity: 0;
+  -webkit-transform: translate(0, 50%);
+          transform: translate(0, 50%);
+  transition: all .4s ease;
+  position: relative;
+}
+.container {
+  display: flex;
+}
+.accordion {
+  max-width: 90%;
+}
+.accordion__single__question {
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+}
+.accordion__single__question:hover, .accordion__single__question:focus {
+  text-decoration: underline;
+}
+.accordion__single__question:after {
+  display: inline-block;
+  margin-left: 4px;
+  color: red;
+  content: '+';
 }

@@ -16,22 +16,34 @@ export class NodalGraph
     this.edges = [];
 
     this.canvas = canvas;
+    this._offsetX = 0;
+    this._offsetY = 0;
+    this.nextOffsetX = 0;
+    this.nextOffsetY = 0;
   }
 
-  get centerX() { return this.canvas.width / 2; }
+  get x() { return this.centerX; }
+  get y() { return this.centerY; }
 
-  get centerY() { return this.canvas.height / 2; }
+  get centerX() { return this.canvas.width / 2 + this._offsetX; }
+  get centerY() { return this.canvas.height / 2 + this._offsetY; }
+
+  get offsetX() { return this._offsetX; }
+  get offsetY() { return this._offsetY; }
+
+  set offsetX(value) { this.nextOffsetX = value; }
+  set offsetY(value) { this.nextOffsetY = value; }
 
   createNewNode()
   {
-    const result = new Node(this.centerX, this.centerY);
+    const result = new Node(this, 0, 0);
     this.nodes.push(result);
     return result;
   }
 
   createNewEdge(from, to)
   {
-    const result = new Edge(from, to);
+    const result = new Edge(this, from, to);
     if (from == to) result.y = from.y - SELF_LOOP_HEIGHT;
     this.edges.push(result);
     return result;
@@ -39,6 +51,9 @@ export class NodalGraph
 
   draw(ctx, dt)
   {
+    this._offsetX = lerp(this._offsetX, this.nextOffsetX, dt);
+    this._offsetY = lerp(this._offsetY, this.nextOffsetY, dt);
+
     //Draw other nodes
     for(let node of this.nodes)
     {
@@ -90,8 +105,9 @@ export class NodalGraph
 
 export class Node
 {
-  constructor(x=0, y=0, label="q")
+  constructor(graph, x=0, y=0, label="q")
   {
+    this.graph = graph;
     this.label = label;
     this._x = x;
     this._y = y;
@@ -100,8 +116,8 @@ export class Node
     this.accept = false;
   }
 
-  get x() { return this._x; }
-  get y() { return this._y; }
+  get x() { return this._x + this.graph.centerX; }
+  get y() { return this._y + this.graph.centerY; }
 
   set x(value) { this.nextX = value; }
   set y(value) { this.nextY = value; }
@@ -138,8 +154,9 @@ export class Node
 
 export class Edge
 {
-  constructor(from, to, label="#")
+  constructor(graph, from, to, label="#")
   {
+    this.graph = graph;
     this.label = label;
     this.from = from;
     this.to = to;

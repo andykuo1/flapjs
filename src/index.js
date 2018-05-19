@@ -1,4 +1,4 @@
-const canvas = document.getElementById("content");
+const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 import Mouse from 'Mouse.js';
 const mouse = new Mouse(canvas, document);
@@ -34,12 +34,12 @@ function onCanvasLoad()
   let edge = null;
 
   node = graph.createNewNode();
-  node.x = canvas.width / 2 - 64;
-  node.y = canvas.height / 2;
+  node.x = -64;
+  node.y = 0;
   node.label = "q0";
   node2 = graph.createNewNode();
-  node2.x = canvas.width / 2 + 64;
-  node2.y = canvas.height / 2;
+  node2.x = 64;
+  node2.y = 0;
   node2.label = "q1";
   edge = graph.createNewEdge(node, node2);
   edge.label = "abc";

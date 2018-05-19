@@ -3,8 +3,45 @@
 		<link rel="stylesheet" href="style.css">
   </head>
   <body>
-    <canvas id="content">Sorry! Your browser is not supported.</canvas>
-    <button id="newstate">New State</button>
+    <header>
+      <h1 id="logo">Deterministic Finite Automata</h1>
+    </header>
+
+    <canvas id="canvas">Sorry! Your browser is not supported.</canvas>
+
+    <div class="content">
+      <div id="viewport"></div>
+      <div class="toolbox">
+        <div class="input">
+          <button class="emerald" id="newstate">New State</button>
+        </div>
+        <div class="input">
+          <input class="input-field">
+          <button class="input-item">...</button>
+        </div>
+
+        <div class='container'>
+          <div class="accordion">
+            <div class="accordion__single">
+              <input class="accordion__single__hidden" type="checkbox" id="acc_div1">
+              <label class="accordion__single__question" for="acc_div1">About</label>
+              <p class="accordion__single__answer">
+                "Something here would be nice." -Andrew
+              </p>
+            </div><!-- end .accordion__single -->
+          </div><!-- end .accordion -->
+        </div><!-- end .container -->
+
+      </div>
+    </div>
+
+    <footer>
+      <div class="test-input">
+        <input class="test-field">
+        <button class="test-item">Execute</button>
+      </div>
+    </footer>
+
     <!-- Entry point -->
     <script src="build/bundle.js"></script>
   </body>

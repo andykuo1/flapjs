@@ -1,5 +1,7 @@
 import { Edge } from 'NodalGraph.js';
 
+const SPAWN_RADIUS = 64;
+
 const RADIUS = 16;
 const RADIUS_SQU = RADIUS * RADIUS;
 const PI2 = Math.PI * 2;
@@ -24,6 +26,7 @@ class NodalGraphController
     this.targetDestination = null;
 
     this.moveTarget = null;
+    this.moveGraph = null;
     this.selectorAngle = 0;
     this.selectEdge = new Edge(null, null, "");
   }
@@ -65,6 +68,7 @@ class NodalGraphController
   {
     let selectState = this.getStateByPosition(this.mouse.x, this.mouse.y);
 
+    //Whether or not cursor has left the node to signify edge drawing...
     if (this.targetSource != null)
     {
       if (this.isSelfMode && selectState != this.targetSource)
@@ -78,6 +82,7 @@ class NodalGraphController
       }
     }
 
+    //Draw the edge if moving edge...
     if (this.targetSource != null && !this.isSelfMode)
     {
       this.selectEdge.from = this.targetSource;
@@ -93,13 +98,31 @@ class NodalGraphController
       this.selectEdge.draw(ctx);
     }
 
+    //Move the target if dragging object...
     if (this.moveTarget != null)
     {
-      this.moveTarget.x = this.mouse.x;
-      this.moveTarget.y = this.mouse.y;
+      //Readjust for graph offset (1/2)...
+      if (this.moveTarget instanceof Edge)
+      {
+        this.moveTarget.x = this.mouse.x;
+        this.moveTarget.y = this.mouse.y;
+      }
+      else
+      {
+        this.moveTarget.x = this.mouse.x - this.graph.x;
+        this.moveTarget.y = this.mouse.y - this.graph.y;
+      }
       selectState = this.moveTarget;
     }
 
+    //Move the graph if draggin empty...
+    if (this.moveGraph != null)
+    {
+      this.graph.offsetX = this.mouse.x - this.moveGraph.x;// - (this.canvas.width / 2);
+      this.graph.offsetY = this.mouse.y - this.moveGraph.y;// - (this.canvas.height / 2);
+    }
+
+    //Hover information...
     if (selectState == null) selectState = this.getEdgeByPosition(this.mouse.x, this.mouse.y);
     if (selectState != null)
     {
@@ -119,8 +142,8 @@ class NodalGraphController
 
   createNewState()
   {
-    const x = Math.random() * this.canvas.width;
-    const y = Math.random() * this.canvas.height;
+    const x = (Math.random() * SPAWN_RADIUS * 2) - SPAWN_RADIUS;
+    const y = (Math.random() * SPAWN_RADIUS * 2) - SPAWN_RADIUS;
     const node = this.graph.createNewNode();
     node.x = x;
     node.y = y;
@@ -162,16 +185,40 @@ class NodalGraphController
   startMove(x, y)
   {
     this.moveTarget = this.getEdgeByPosition(x, y) || this.getStateByPosition(x, y);
+    if (this.moveTarget == null)
+    {
+      this.moveGraph = { x: this.mouse.x, y: this.mouse.y };
+    }
   }
 
   endMove(x, y)
   {
     if (this.moveTarget != null)
     {
-      this.moveTarget.x = x;
-      this.moveTarget.y = y;
+      //Readjust for graph offset (2/2)...
+      if (this.moveTarget instanceof Edge)
+      {
+        this.moveTarget.x = this.mouse.x;
+        this.moveTarget.y = this.mouse.y;
+      }
+      else
+      {
+        this.moveTarget.x = this.mouse.x - this.graph.x;
+        this.moveTarget.y = this.mouse.y - this.graph.y;
+      }
+
+      this.moveTarget = null;
     }
-    this.moveTarget = null;
+
+    if (this.moveGraph != null)
+    {
+      this.graph.offsetX = this.mouse.x - this.moveGraph.x;// - (this.canvas.width / 2);
+      this.graph.offsetY = this.mouse.y - this.moveGraph.y;// - (this.canvas.height / 2);
+
+      //TODO: Limit how far you can move the graph...
+
+      this.moveGraph = null;
+    }
   }
 
   getStateByPosition(x, y)
