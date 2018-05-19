@@ -10,6 +10,7 @@ const EDGE_RADIUS = 16;
 const EDGE_RADIUS_SQU = EDGE_RADIUS * EDGE_RADIUS;
 const SELF_LOOP_HEIGHT = 32;
 
+const GRAPH_INFO_COLOR = "lightgray";
 const STROKE = "black";
 const DASHSPACE = [6, 4];
 const DASHCOLOR = "rgba(0,0,0,0.6)";
@@ -82,6 +83,9 @@ class NodalGraphController
 
   draw(ctx, dt)
   {
+    //TODO: Drawing the graph info...
+
+    //Get hover information...
     let selectState = this.getStateByPosition(this.mouse.x, this.mouse.y);
 
     //Whether or not cursor has left the node to signify edge drawing...
@@ -143,17 +147,15 @@ class NodalGraphController
     if (selectState == null) selectState = this.getEdgeByPosition(this.mouse.x, this.mouse.y);
     if (selectState != null)
     {
+      ctx.save();
       const angle = this.selectorAngle = (this.selectorAngle + (dt * ROTFACTOR)) % PI2;
-      const prevLineWidth = ctx.lineWidth;
       ctx.strokeStyle = DASHCOLOR;
       ctx.lineWidth = 2;
-      ctx.save();
       ctx.beginPath();
       ctx.setLineDash(DASHSPACE);
       ctx.arc(selectState.x, selectState.y, RADIUS + 4, 0 + angle, PI2 + angle);
       ctx.stroke();
       ctx.restore();
-      ctx.lineWidth = prevLineWidth;
     }
   }
 

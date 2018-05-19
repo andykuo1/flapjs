@@ -87,7 +87,7 @@ canvas {
   padding: 0.5em;
   overflow-x: hidden;
   overflow-y: scroll;
-  background: dodgerblue;
+  background: #ACBABF;/* dodgerblue */
 }
 .toolbox > * {
   margin-bottom: 0.5em;
