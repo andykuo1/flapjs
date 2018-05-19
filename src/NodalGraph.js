@@ -1,6 +1,13 @@
 const RADIUS = 16;
+const RADIUS_SQU = 256;
 const DIAMETER = RADIUS * 2;
 const RADIUS_INNER = 12;
+
+const NODE_COLOR = "#EDEBA6";
+
+const PADDING_RADIUS_SQU = 2304;
+const PHYSICS_TICKS = 100;
+
 const PI2 = Math.PI * 2;
 const HALF_PI = Math.PI / 2.0;
 const FOURTH_PI = Math.PI / 4.0;
@@ -47,6 +54,12 @@ export class NodalGraph
     if (from == to) result.y = from.y - SELF_LOOP_HEIGHT;
     this.edges.push(result);
     return result;
+  }
+
+  clear()
+  {
+    this.nodes.length = 0;
+    this.edges.length = 0;
   }
 
   draw(ctx, dt)
@@ -114,6 +127,9 @@ export class Node
     this.nextX = x;
     this.nextY = y;
     this.accept = false;
+
+    this._shouldPhysics = true;
+    this._physicsTicks = 0;
   }
 
   get x() { return this._x + this.graph.centerX; }
@@ -124,6 +140,27 @@ export class Node
 
   update(dt)
   {
+    if (this._shouldPhysics || --this._physicsTicks <= 0)
+    {
+      this._physicsTicks = PHYSICS_TICKS;
+      let flag = false;
+      for(const node of this.graph.nodes)
+      {
+        if (node == this) continue;
+        const dx = this.nextX - node.nextX;
+        const dy = this.nextY - node.nextY;
+        if (dx * dx + dy * dy < PADDING_RADIUS_SQU)
+        {
+          node._shouldPhysics = true;
+          this.nextX += dx * 0.5;
+          this.nextY += dy * 0.5;
+          flag = true;
+        }
+      }
+
+      this._shouldPhysics = flag;
+    }
+
     this._x = lerp(this._x, this.nextX, dt);
     this._y = lerp(this._y, this.nextY, dt);
   }
@@ -133,7 +170,7 @@ export class Node
     ctx.font = "12px Arial";
     ctx.textAlign= "center";
     ctx.strokeStyle = "black";
-    ctx.fillStyle = "yellow";
+    ctx.fillStyle = NODE_COLOR;
 
     ctx.beginPath();
     ctx.arc(this.x, this.y, RADIUS, 0, PI2);

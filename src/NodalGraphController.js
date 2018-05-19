@@ -56,11 +56,16 @@ class NodalGraphController
       }
     });
 
-    //Setup button
+    //Setup buttons
     const buttonNewState = document.getElementById("newstate");
     buttonNewState.addEventListener('click', (event) => {
       //Create new state
       this.createNewState();
+    });
+    const buttonClearGraph = document.getElementById("cleargraph");
+    buttonClearGraph.addEventListener('click', (event) => {
+      //Clear graph
+      this.graph.clear();
     });
   }
 
@@ -118,8 +123,8 @@ class NodalGraphController
     //Move the graph if draggin empty...
     if (this.moveGraph != null)
     {
-      this.graph.offsetX = this.mouse.x - this.moveGraph.x;// - (this.canvas.width / 2);
-      this.graph.offsetY = this.mouse.y - this.moveGraph.y;// - (this.canvas.height / 2);
+      this.graph.offsetX = this.mouse.x - this.moveGraph.x;
+      this.graph.offsetY = this.mouse.y - this.moveGraph.y;
     }
 
     //Hover information...
@@ -212,8 +217,8 @@ class NodalGraphController
 
     if (this.moveGraph != null)
     {
-      this.graph.offsetX = this.mouse.x - this.moveGraph.x;// - (this.canvas.width / 2);
-      this.graph.offsetY = this.mouse.y - this.moveGraph.y;// - (this.canvas.height / 2);
+      this.graph.offsetX = this.mouse.x - this.moveGraph.x;
+      this.graph.offsetY = this.mouse.y - this.moveGraph.y;
 
       //TODO: Limit how far you can move the graph...
 
