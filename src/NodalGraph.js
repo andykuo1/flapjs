@@ -22,6 +22,8 @@ export class NodalGraph
     this.nodes = [];
     this.edges = [];
 
+    this.graphLabelStates = document.getElementById("graph-states");
+
     this.canvas = canvas;
     this._offsetX = 0;
     this._offsetY = 0;
@@ -40,11 +42,45 @@ export class NodalGraph
   set offsetX(value) { this.nextOffsetX = value; }
   set offsetY(value) { this.nextOffsetY = value; }
 
+  onCreateNode(node)
+  {
+    const element = document.createElement("label");
+    element.setAttribute("contenteditable", "true");
+    element.addEventListener('input', (event) => {
+      node.label = element.textContent;
+    });
+    element.innerHTML = node.label;
+    node._element = element;
+    this.graphLabelStates.appendChild(element);
+  }
+
+  onDestroyNode(node)
+  {
+    this.graphLabelStates.removeChild(node._element);
+  }
+
+  onCreateEdge(edge)
+  {
+    
+  }
+
+  onDestroyEdge(edge)
+  {
+
+  }
+
   createNewNode()
   {
     const result = new Node(this, 0, 0);
     this.nodes.push(result);
+    this.onCreateNode(result);
     return result;
+  }
+
+  destroyNode(node)
+  {
+    this.nodes.splice(this.nodes.indexOf(node), 1);
+    this.onDestroyNode(node);
   }
 
   createNewEdge(from, to)
@@ -52,12 +88,28 @@ export class NodalGraph
     const result = new Edge(this, from, to);
     if (from == to) result.y = from.y - SELF_LOOP_HEIGHT;
     this.edges.push(result);
+    this.onCreateEdge(result);
     return result;
+  }
+
+  destroyEdge(edge)
+  {
+    this.edges.splice(this.edges.indexOf(edge), 1);
+    this.onDestroyEdge(edge);
   }
 
   clear()
   {
+    for(let node of this.nodes)
+    {
+      this.onDestroyNode(node);
+    }
     this.nodes.length = 0;
+
+    for(let edge of this.edges)
+    {
+      this.onDestroyEdge(edge);
+    }
     this.edges.length = 0;
   }
 

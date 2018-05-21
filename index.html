@@ -22,27 +22,51 @@
           <button class="input-item">...</button>
         </div>
 
-        <div class='container'>
+        <div class="flex-container">
           <div class="accordion">
-            <div class="accordion__single">
-              <input class="accordion__single__hidden" type="checkbox" id="div_about">
-              <label class="accordion__single__question" for="div_about">About</label>
-              <p class="accordion__single__answer">
+            <div class="accordion-element">
+              <input class="accordion-input" type="checkbox" id="section-graph">
+              <label class="accordion-label" for="section-graph">Graph</label>
+              <p class="accordion-content">
+                <span class="stats-content">
+                  <label>Q:</label>
+                    <span class="stats-list" id="graph-states"></span>
+                  <label>&delta;:</label>
+                  <span class="stats-list" id="graph-transitions">
+                    <label>(q0, 0) &rarr; q2</label>
+                    <label>(q1, 0) &rarr; q1</label>
+                    <label>(q2, 0) &rarr; q0</label>
+                  </span>
+                  <label>Initial:</label>
+                    <span class="stats-list" id="graph-initial">
+                      <label>q0</label>
+                    </span>
+                  <label>Accepts:</label>
+                    <span class="stats-list" id="graph-finals">
+                      <label>q0, q1, q2</label>
+                    </span>
+                </span>
+              </p>
+            </div>
+            <div class="accordion-element">
+              <input class="accordion-input" type="checkbox" id="section-about">
+              <label class="accordion-label" for="section-about">About</label>
+              <p class="accordion-content">
                 "Something here would be nice." -Andrew
               </p>
-            </div><!-- end .accordion__single -->
-            <div class="accordion__single">
-              <input class="accordion__single__hidden" type="checkbox" id="div_options">
-              <label class="accordion__single__question" for="div_options">Options</label>
-              <p class="accordion__single__answer">
+            </div>
+            <div class="accordion-element">
+              <input class="accordion-input" type="checkbox" id="section-options">
+              <label class="accordion-label" for="section-options">Options</label>
+              <p class="accordion-content">
                 <button id="simulate_physics">Simulate Physics</button>
                 <br/>
                 <input class="option" type="checkbox" id="checkbox1">
                 <label>Moo = &#931; Moo.</label>
               </p>
-            </div><!-- end .accordion__single -->
-          </div><!-- end .accordion -->
-        </div><!-- end .container -->
+            </div>
+          </div>
+        </div>
 
         <div class="input">
           <button class="silver" download="flap-machine.png" id="export_image">Export As Image</button>

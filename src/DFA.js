@@ -30,24 +30,3 @@ export class DFA
     return this.finalStates.includes(state);
   }
 }
-
-//node --experimental-modules ./src/DFA.mjs
-
-let machine = new DFA(
-  [["0", "0", "1"],
-  ["0", "1", "0"],
-  ["1", "0", "1"],
-  ["1", "1", "1"]],
-  "0", ["0"]);
-
-test("", machine);
-test("0", machine);
-test("1", machine);
-test("011111", machine);
-test("11010101", machine);
-test("1111", machine);
-
-function test(string, machine)
-{
-  console.log(string + " > " + machine.solve(string[Symbol.iterator]()));
-}
