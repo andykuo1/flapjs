@@ -38,10 +38,10 @@ To make a program that is more accessible and intuitive to use, so we can become
 ## Setting up the workspace
 
 ### Installing [Node.js](https://nodejs.org/en/)
-Just get the current version and install it. This is required to test the program.
+This is required to test the program. Just get the current version and install it.
 
 ### Installing [Git](https://git-scm.com/)
-Just get the current version and install it. This is required to edit the program remotely. The repository is hosted at [GitHub](https://github.com/andykuo1/flapjs).
+This is required to edit the program remotely. Just get the current version and install it. The repository is hosted at [GitHub](https://github.com/andykuo1/flapjs).
 
 ### Installing [Atom.io](https://nodejs.org/en/)
 This is not required, but recommended. Just get the current version and install it.
