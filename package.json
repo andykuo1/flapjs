@@ -9,7 +9,7 @@
   },
   "keywords": [],
   "author": "Andrew Kuo",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "webpack": "^4.5.0"
   },
