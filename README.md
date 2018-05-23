@@ -37,26 +37,26 @@ To make a program that is more accessible and intuitive to use, so we can become
 
 ## Setting up the workspace
 
-#### Installing [Node.js](https://nodejs.org/en/)
+### Installing [Node.js](https://nodejs.org/en/)
 Just get the current version and install it. This is required to test the program.
 
-#### Installing [Git](https://git-scm.com/)
+### Installing [Git](https://git-scm.com/)
 Just get the current version and install it. This is required to edit the program remotely. The repository is hosted at [GitHub](https://github.com/andykuo1/flapjs).
 
-#### Installing [Atom.io](https://nodejs.org/en/)
+### Installing [Atom.io](https://nodejs.org/en/)
 This is not required, but recommended. Just get the current version and install it.
 
 Otherwise, you just need a text editor to write JavaScript, HTML, and CSS code.
 
 *(Be sure to get the compatible versions for either Windows or MacOS.)*
 
-##### Installing Recommended Atom Packages
+#### Installing Recommended Atom Packages
 * [Teletype](https://teletype.atom.io/)
   * A pair programming package for collaborative programming in real-time.
 * [PlatformIO IDE Terminal](https://atom.io/packages/platformio-ide-terminal)
   * An integrated terminal for the Atom.io editor. Allows you easy access to run commands.
 
-#### Getting the remote repository
+### Getting the remote repository
 Open a command line or terminal and enter a directory to where to copy the project repository. This can be anywhere in your local file system (like your home directory). For example:
 
 ```
@@ -81,7 +81,7 @@ To ensure and verify the state of the repository enter the following command:
 git status
 ```
 
-#### Installing dependencies
+### Installing dependencies
 Open a command line or terminal and enter into the project directory. This should be where you've copied the remote repository. Following the previous example:
 
 ```
