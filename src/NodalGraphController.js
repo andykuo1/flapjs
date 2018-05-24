@@ -210,6 +210,8 @@ class NodalGraphController
   {
     if (this.moveMode)
     {
+      //TODO: Change over moveTarget to targetDestination
+      //TODO: Change over moveTargetType to targetMode instead
       if (this.moveTarget = this.getEdgeByPosition(x, y))
       {
         this.moveTargetType = "edge";
