@@ -22,7 +22,7 @@ class NodalGraphController
 
   load()
   {
-    this.mouse.events.on('mousedown', (mouse, button) => {
+    this.mouse.on('mousedown', (mouse, button) => {
       if (button == 3)
       {
         //Move target?
@@ -35,7 +35,7 @@ class NodalGraphController
       this.prevMouse.x = mouse.x;
       this.prevMouse.y = mouse.y;
     });
-    this.mouse.events.on('mouseup', (mouse, button) => {
+    this.mouse.on('mouseup', (mouse, button) => {
       if (button == 3)
       {
         //Finish moving target?

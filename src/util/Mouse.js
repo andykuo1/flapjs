@@ -1,4 +1,11 @@
-import EventHandler from 'EventHandler.js';
+import Eventable from 'util/Eventable.js';
+
+const PREVENT_CONTEXT_MENU = true;
+
+//EVENT: mouseup(mouse, button)
+//EVENT: mousedown(mouse, button)
+//EVENT: mouseclick(mouse, button)
+//EVENT: mousewheel(mouse, dx, dy)
 
 class Mouse
 {
@@ -15,7 +22,6 @@ class Mouse
     this.y = 0;
     this.scrollX = 0;
     this.scrollY = 0;
-    this.events = new EventHandler();
 
     this._canvas = canvas;
     this._element = element;
@@ -31,8 +37,12 @@ class Mouse
     this._touchstop = this.onTouchStop.bind(this);
 
     this._contextmenu = event => {
-      event.preventDefault();
-      return false;
+      if (PREVENT_CONTEXT_MENU)
+      {
+        event.preventDefault();
+        return false;
+      }
+      return true;
     };
 
     this._element.addEventListener('contextmenu', this._contextmenu, false);
@@ -58,26 +68,26 @@ class Mouse
   onMouseUp(event)
   {
     this.onMouseMove(event);
-    this.events.emit('mouseup', this, event.which);
+    this.emit('mouseup', this, event.which);
   }
 
   onMouseDown(event)
   {
     this.onMouseMove(event);
-    this.events.emit('mousedown', this, event.which);
+    this.emit('mousedown', this, event.which);
   }
 
   onMouseClick(event)
   {
     this.onMouseMove(event);
-    this.events.emit('mouseclick', this, event.which);
+    this.emit('mouseclick', this, event.which);
   }
 
   onMouseWheel(event)
   {
     this.scrollX += event.deltaX;
     this.scrollY += event.deltaY;
-    this.events.emit('wheel', this, event.deltaX, event.deltaY);
+    this.emit('mousewheel', this, event.deltaX, event.deltaY);
   }
 
   onMouseMove(event)
@@ -109,7 +119,10 @@ class Mouse
   }
 }
 
-Mouse.BUTTON_LEFT = 1;
-Mouse.BUTTON_RIGHT = 3;
+Mouse.BUTTON_LEFT = 0;
+Mouse.BUTTON_MIDDLE = 1;
+Mouse.BUTTON_RIGHT = 2;
+
+Object.assign(Mouse.prototype, Eventable);
 
 export default Mouse;
