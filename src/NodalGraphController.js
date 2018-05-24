@@ -10,14 +10,17 @@ class NodalGraphController
     this.mouse = mouse;
     this.graph = graph;
 
-    this.targetSource = null;
+    this.targetMode = null;
     this.targetDestination = null;
+    this.proxyEdge = new Edge(null, null, "");
+
+    this.targetSource = null;
     this.prevMouse = { x: 0, y: 0 };
 
     this.moveTarget = null;
+    this.moveTargetType = null;
     this.moveGraph = null;
     this.selectorAngle = 0;
-    this.selectEdge = new Edge(null, null, "");
   }
 
   load()
@@ -78,54 +81,75 @@ class NodalGraphController
     //TODO: Drawing the graph info...
 
     //Get hover information...
-    let selectState = this.getStateByPosition(this.mouse.x, this.mouse.y);
+    let selectTarget = this.getStateByPosition(this.mouse.x, this.mouse.y);
+    let selectType = "state";
 
-    //Whether or not cursor has left the node to signify edge drawing...
-    if (this.targetSource != null)
+    this.targetDestination = selectTarget;
+
+    //If clicked on state...
+    if (this.targetMode == "state")
     {
-      if (this.isSelfMode && selectState != this.targetSource)
+      //Start creating edges if cursor leaves state...
+      if (this.isSelfMode && this.targetDestination != this.targetSource)
       {
         this.isSelfMode = false;
       }
 
+      //If is creating edges and NOT toggling accept state...
       if (!this.isSelfMode)
       {
-        this.targetDestination = selectState;
+        this.proxyEdge.from = this.targetSource;
+        this.proxyEdge.to = this.targetDestination || this.mouse;
+
+        //If the cursor returns to the state after leaving it...
+        if (this.targetSource == this.targetDestination)
+        {
+          //Make it a self loop
+          this.proxyEdge.y = this.proxyEdge.from.y - SELF_LOOP_HEIGHT;
+        }
+        //TODO: if (this.getEdgesByNodes(this.targetSource, this.targetDestination) != null)
+        else
+        {
+          //Make sure it is not a self loop
+          this.proxyEdge.quad = null;
+        }
+
+        //Draw the proxy edge
+        NodalGraphRenderer.drawEdges(ctx, this.proxyEdge);
       }
     }
 
-    //Draw the edge if moving edge...
-    if (this.targetSource != null && !this.isSelfMode)
+    //Whether or not cursor has left the node to signify edge drawing...
+    if (this.targetSource != null)
     {
-      this.selectEdge.from = this.targetSource;
-      this.selectEdge.to = this.targetDestination || this.mouse;
-      if (this.targetSource == this.targetDestination)
+      if (this.isSelfMode && selectTarget != this.targetSource)
       {
-        this.selectEdge.y = this.selectEdge.from.y - SELF_LOOP_HEIGHT;
+        this.isSelfMode = false;
       }
-      //TODO: if (this.getEdgesByNodes(this.targetSource, this.targetDestination) != null)
-      else
+
+      //Draw the edge if moving edge...
+      if (!this.isSelfMode)
       {
-        this.selectEdge.quad = null;
+        this.proxyEdge.from = this.targetSource;
+        this.proxyEdge.to = this.targetDestination || this.mouse;
+        if (this.targetSource == this.targetDestination)
+        {
+          this.proxyEdge.y = this.proxyEdge.from.y - SELF_LOOP_HEIGHT;
+        }
+        //TODO: if (this.getEdgesByNodes(this.targetSource, this.targetDestination) != null)
+        else
+        {
+          this.proxyEdge.quad = null;
+        }
+        NodalGraphRenderer.drawEdges(ctx, this.proxyEdge);
       }
-      NodalGraphRenderer.drawEdges(ctx, this.selectEdge);
     }
 
     //Move the target if dragging object...
     if (this.moveTarget != null)
     {
-      //Readjust for graph offset (1/2)...
-      if (this.moveTarget instanceof Edge)
-      {
-        this.moveTarget.x = this.mouse.x;
-        this.moveTarget.y = this.mouse.y;
-      }
-      else
-      {
-        this.moveTarget.x = this.mouse.x - this.graph.centerX;
-        this.moveTarget.y = this.mouse.y - this.graph.centerY;
-      }
-      selectState = this.moveTarget;
+      this.resolveMove();
+      selectTarget = this.moveTarget;
     }
 
     //Move the graph if draggin empty...
@@ -136,11 +160,44 @@ class NodalGraphController
     }
 
     //Hover information...
-    if (selectState == null) selectState = this.getEdgeByPosition(this.mouse.x, this.mouse.y);
-    if (selectState == null) selectState = this.getEdgeEndPointByPosition(this.mouse.x, this.mouse.y);
-    if (selectState != null)
+    if (selectTarget == null)
     {
-      NodalGraphRenderer.drawHoverCircle(ctx, selectState.x, selectState.y, NODE_RADIUS + 4);
+      selectTarget = this.getEdgeByPosition(this.mouse.x, this.mouse.y);
+      selectType = "edge";
+    }
+    if (selectTarget == null)
+    {
+      selectTarget = this.getEdgeEndPointByPosition(this.mouse.x, this.mouse.y);
+      selectType = "endpoint";
+    }
+    if (selectTarget != null)
+    {
+      let x = 0;
+      let y = 0;
+      let r = CURSOR_RADIUS;
+      switch(selectType)
+      {
+        case "state":
+          x = selectTarget.x;
+          y = selectTarget.y;
+          r = NODE_RADIUS;
+          break;
+        case "edge":
+          x = selectTarget.x;
+          y = selectTarget.y;
+          r = EDGE_RADIUS;
+          break;
+        case "endpoint":
+          const endpoint = selectTarget.getEndPoint();
+          x = endpoint[0];
+          y = endpoint[1];
+          r = ENDPOINT_RADIUS;
+          break;
+        default:
+          x = this.mouse.x;
+          y = this.mouse.y;
+      }
+      NodalGraphRenderer.drawHoverCircle(ctx, x, y, r + HOVER_RADIUS_OFFSET);
     }
   }
 
@@ -204,8 +261,19 @@ class NodalGraphController
 
   startMove(x, y)
   {
-    this.moveTarget = this.getEdgeByPosition(x, y) || this.getStateByPosition(x, y);
-    if (this.moveTarget == null)
+    if (this.moveTarget = this.getEdgeByPosition(x, y))
+    {
+      this.moveTargetType = "edge";
+    }
+    else if (this.moveTarget = this.getStateByPosition(x, y))
+    {
+      this.moveTargetType = "state";
+    }
+    else if (this.moveTarget = this.getEdgeEndPointByPosition(x, y))
+    {
+      this.moveTargetType = "endpoint";
+    }
+    else
     {
       this.moveGraph = { x: this.mouse.x, y: this.mouse.y };
     }
@@ -215,18 +283,7 @@ class NodalGraphController
   {
     if (this.moveTarget != null)
     {
-      //Readjust for graph offset (2/2)...
-      if (this.moveTarget instanceof Edge)
-      {
-        this.moveTarget.x = this.mouse.x;
-        this.moveTarget.y = this.mouse.y;
-      }
-      else
-      {
-        this.moveTarget.x = this.mouse.x - this.graph.centerX;
-        this.moveTarget.y = this.mouse.y - this.graph.centerY;
-      }
-
+      this.resolveMove();
       this.moveTarget = null;
     }
 
@@ -238,6 +295,28 @@ class NodalGraphController
       //TODO: Limit how far you can move the graph...
 
       this.moveGraph = null;
+    }
+  }
+
+  resolveMove()
+  {
+    //Readjust render position for graph offset
+    if (this.moveTarget instanceof Edge)
+    {
+      if (this.moveTargetType == "edge")
+      {
+        this.moveTarget.x = this.mouse.x;
+        this.moveTarget.y = this.mouse.y;
+      }
+      else if (this.moveTargetType == "endpoint")
+      {
+        this.moveTarget.to = this.targetDestination || this.mouse;
+      }
+    }
+    else
+    {
+      this.moveTarget.x = this.mouse.x - this.graph.centerX;
+      this.moveTarget.y = this.mouse.y - this.graph.centerY;
     }
   }
 
