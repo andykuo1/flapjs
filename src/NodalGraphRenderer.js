@@ -2,20 +2,19 @@ import { Node } from 'NodalGraph.js';
 
 class NodalGraphRenderer
 {
-  constructor(graph)
+  constructor()
   {
-    this.graph = graph;
     this.hoverAngle = 0;
   }
 
-  render(ctx, dt)
+  render(ctx, dt, graph)
   {
-    this.drawNodes(ctx, this.graph.nodes);
+    this.drawNodes(ctx, graph.nodes);
 
     //Draw initial node
-    if (this.graph.nodes.length > 0)
+    if (graph.nodes.length > 0)
     {
-      const initial = this.graph.getInitialState();
+      const initial = graph.getInitialState();
       ctx.save();
       {
         drawInitialMarker(ctx, initial);
@@ -24,7 +23,7 @@ class NodalGraphRenderer
     }
 
     //Draw edges
-    this.drawEdges(ctx, this.graph.edges);
+    this.drawEdges(ctx, graph.edges);
 
     //Update hover angles
     this.hoverAngle = (this.hoverAngle + HOVER_ANGLE_SPEED) % PI2;
@@ -140,7 +139,7 @@ function drawEdge(ctx, edge)
 
   if (quad == null)
   {
-    const dx = from.x - to.x;//TODO: Apply quad to this
+    const dx = from.x - to.x;
     const dy = from.y - to.y;
     const angle = -Math.atan2(dy, dx) - HALF_PI;
     const xx = NODE_RADIUS * Math.sin(angle);
@@ -218,4 +217,4 @@ function drawInitialMarker(ctx, initialNode)
   ctx.stroke();
 }
 
-export default NodalGraphRenderer;
+export default new NodalGraphRenderer();

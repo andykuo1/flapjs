@@ -1,4 +1,6 @@
 import { Edge } from 'NodalGraph.js';
+import NodalGraphRenderer from 'NodalGraphRenderer.js';
+import NodalGraphSorter from 'NodalGraphSorter.js';
 
 class NodalGraphController
 {
@@ -61,7 +63,7 @@ class NodalGraphController
     const buttonSimulatePhysics = document.getElementById("simulate_physics");
     buttonSimulatePhysics.addEventListener('click', (event) => {
       //Begin to simulate physics for graph...
-      this.graph._simulatePhysics = true;
+      NodalGraphSorter.sort();
     });
     const buttonExportImage = document.getElementById("export_image");
     buttonExportImage.addEventListener('click', (event) => {
@@ -71,7 +73,7 @@ class NodalGraphController
     });
   }
 
-  draw(ctx, dt, renderer)
+  draw(ctx, dt)
   {
     //TODO: Drawing the graph info...
 
@@ -106,7 +108,7 @@ class NodalGraphController
       {
         this.selectEdge.quad = null;
       }
-      renderer.drawEdges(ctx, this.selectEdge);
+      NodalGraphRenderer.drawEdges(ctx, this.selectEdge);
     }
 
     //Move the target if dragging object...
@@ -137,7 +139,7 @@ class NodalGraphController
     if (selectState == null) selectState = this.getEdgeByPosition(this.mouse.x, this.mouse.y);
     if (selectState != null)
     {
-      renderer.drawHoverCircle(ctx, selectState.x, selectState.y, NODE_RADIUS + 4);
+      NodalGraphRenderer.drawHoverCircle(ctx, selectState.x, selectState.y, NODE_RADIUS + 4);
     }
   }
 
