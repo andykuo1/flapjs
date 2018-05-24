@@ -23,9 +23,11 @@ function onAnimationFrame(time)
 }
 
 import NodalGraphController from 'NodalGraphController.js';
+import NodalGraphRenderer from 'NodalGraphRenderer.js';
 import { NodalGraph } from 'NodalGraph.js';
 const graph = new NodalGraph(canvas);
 const controller = new NodalGraphController(canvas, mouse, graph);
+const renderer = new NodalGraphRenderer(graph);
 
 function onCanvasLoad()
 {
@@ -52,7 +54,8 @@ let prevTime = 0;
 function onCanvasDraw(ctx, time)
 {
   const dt = (time - prevTime) / avgFramesPerSecond;
-  graph.draw(ctx, dt);
-  controller.draw(ctx, dt);
+  graph.update(dt);
+  renderer.render(ctx, dt);
+  controller.draw(ctx, dt, renderer);
   prevTime = time;
 }

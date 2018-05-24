@@ -1,23 +1,5 @@
 import { Edge } from 'NodalGraph.js';
 
-const SPAWN_RADIUS = 64;
-const CLICK_RADIUS_SQU = 4;
-
-const RADIUS = 16;
-const RADIUS_SQU = RADIUS * RADIUS;
-const PI2 = Math.PI * 2;
-const EDGE_RADIUS = 16;
-const EDGE_RADIUS_SQU = EDGE_RADIUS * EDGE_RADIUS;
-const SELF_LOOP_HEIGHT = 32;
-
-const EXPORT_FILE_NAME = "flap-machine.png";
-
-const GRAPH_INFO_COLOR = "lightgray";
-const STROKE = "black";
-const DASHSPACE = [6, 4];
-const DASHCOLOR = "rgba(0,0,0,0.6)";
-const ROTFACTOR = 0.01;
-
 class NodalGraphController
 {
   constructor(canvas, mouse, graph)
@@ -89,7 +71,7 @@ class NodalGraphController
     });
   }
 
-  draw(ctx, dt)
+  draw(ctx, dt, renderer)
   {
     //TODO: Drawing the graph info...
 
@@ -124,7 +106,7 @@ class NodalGraphController
       {
         this.selectEdge.quad = null;
       }
-      this.selectEdge.draw(ctx);
+      renderer.drawEdges(ctx, this.selectEdge);
     }
 
     //Move the target if dragging object...
@@ -155,15 +137,7 @@ class NodalGraphController
     if (selectState == null) selectState = this.getEdgeByPosition(this.mouse.x, this.mouse.y);
     if (selectState != null)
     {
-      ctx.save();
-      const angle = this.selectorAngle = (this.selectorAngle + (dt * ROTFACTOR)) % PI2;
-      ctx.strokeStyle = DASHCOLOR;
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.setLineDash(DASHSPACE);
-      ctx.arc(selectState.x, selectState.y, RADIUS + 4, 0 + angle, PI2 + angle);
-      ctx.stroke();
-      ctx.restore();
+      renderer.drawHoverCircle(ctx, selectState.x, selectState.y, NODE_RADIUS + 4);
     }
   }
 
