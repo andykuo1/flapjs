@@ -128,8 +128,9 @@ function drawEdge(ctx, edge)
   const to = edge.to;
   const x = edge.x;
   const y = edge.y;
-  const centerX = edge.centerX;
-  const centerY = edge.centerY;
+  const midpoint = edge.getMidPoint();
+  const centerX = midpoint[0];
+  const centerY = midpoint[1];
   const quad = edge.quad;
   const label = edge.label;
 
@@ -137,50 +138,26 @@ function drawEdge(ctx, edge)
   let endY = 0;
   let arrowAngle = 0;
 
+  const start = edge.getStartPoint();
+  const end = (edge.to instanceof Node) ? edge.getEndPoint() : [edge.to.x, edge.to.y];
+  endX = end[0];
+  endY = end[1];
+
+  ctx.beginPath();
+  ctx.moveTo(start[0], start[1]);
+
   if (quad == null)
   {
-    const dx = from.x - to.x;
-    const dy = from.y - to.y;
-    const angle = -Math.atan2(dy, dx) - HALF_PI;
-    const xx = NODE_RADIUS * Math.sin(angle);
-    const yy = NODE_RADIUS * Math.cos(angle);
-
-    const startX = from.x + xx;
-    const startY = from.y + yy;
-    endX = to.x - (to instanceof Node ? xx : 0);
-    endY = to.y - (to instanceof Node ? yy : 0);
-    arrowAngle = Math.atan2(startX - endX, startY - endY) + Math.PI;
-
-    ctx.beginPath();
-    ctx.moveTo(startX, startY);
-    ctx.lineTo(endX, endY);
+    arrowAngle = Math.atan2(start[0] - end[0], start[1] - end[1]) + Math.PI;
+    ctx.lineTo(end[0], end[1]);
   }
   else
   {
-    const quadX = centerX + (quad.x * 2);
-    const quadY = centerY + (quad.y * 2);
-
-    const sdx = from.x - quadX;
-    const sdy = from.y - quadY;
-    const sangle = -Math.atan2(sdy, sdx) - HALF_PI + (from == to ? FOURTH_PI : 0);
-    const sx = NODE_RADIUS * Math.sin(sangle);
-    const sy = NODE_RADIUS * Math.cos(sangle);
-
-    const edx = quadX - to.x;
-    const edy = quadY - to.y;
-    const eangle = -Math.atan2(edy, edx) - HALF_PI + (from == to ? -FOURTH_PI : 0);
-    const ex = NODE_RADIUS * Math.sin(eangle);
-    const ey = NODE_RADIUS * Math.cos(eangle);
-
-    const startX = from.x + sx;
-    const startY = from.y + sy;
-    endX = to.x - (to instanceof Node ? ex : 0);
-    endY = to.y - (to instanceof Node ? ey : 0);
-    arrowAngle = Math.atan2(quadX - endX, quadY - endY) + Math.PI;
-
-    ctx.beginPath();
-    ctx.moveTo(startX, startY);
-    ctx.quadraticCurveTo(quadX, quadY, endX, endY);
+    const centerQuad = edge.getCenterPoint();
+    centerQuad[0] += edge.quad.x;
+    centerQuad[1] += edge.quad.y;
+    arrowAngle = Math.atan2(centerQuad[0] - end[0], centerQuad[1] - end[1]) + Math.PI;
+    ctx.quadraticCurveTo(centerQuad[0], centerQuad[1], end[0], end[1]);
   }
 
   ctx.moveTo(

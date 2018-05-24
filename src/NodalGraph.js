@@ -142,6 +142,8 @@ export class Node
     this.nextX = x;
     this.nextY = y;
     this.accept = false;
+
+    this._dirty = true;
   }
 
   get x() { return this._x + this.graph.centerX; }
@@ -167,6 +169,103 @@ export class Edge
     this.to = to;
 
     this.quad = null;
+    this._dirty = true;
+  }
+
+  /**
+  * Returns the starting point of the edge on state from
+  */
+  getStartPoint()
+  {
+    if (this.quad == null)
+    {
+      const dx = this.from.x - this.to.x;
+      const dy = this.from.y - this.to.y;
+      const angle = -Math.atan2(dy, dx) - HALF_PI;
+      const xx = NODE_RADIUS * Math.sin(angle);
+      const yy = NODE_RADIUS * Math.cos(angle);
+
+      const startX = this.from.x + xx;
+      const startY = this.from.y + yy;
+      return [startX, startY];
+    }
+    else
+    {
+      const midpoint = this.getMidPoint();
+      const quadX = midpoint[0] + (this.quad.x * 2);
+      const quadY = midpoint[1] + (this.quad.y * 2);
+
+      const dx = this.from.x - quadX;
+      const dy = this.from.y - quadY;
+      const angle = -Math.atan2(dy, dx) - HALF_PI + (this.isSelfLoop() ? FOURTH_PI : 0);
+      const xx = NODE_RADIUS * Math.sin(angle);
+      const yy = NODE_RADIUS * Math.cos(angle);
+
+      const result = midpoint;
+      result[0] = this.from.x + xx;
+      result[1] = this.from.y + yy;
+      return result;
+    }
+  }
+
+  /**
+  * Returns the point on the curve between start and end points
+  */
+  getCenterPoint()
+  {
+    const midpoint = this.getMidPoint();
+    if (this.quad != null)
+    {
+      midpoint[0] += this.quad.x;
+      midpoint[1] += this.quad.y;
+    }
+    return midpoint;
+  }
+
+  /**
+  * Returns the ending point of the edge on state to
+  */
+  getEndPoint()
+  {
+    if (this.quad == null)
+    {
+      const dx = this.from.x - this.to.x;
+      const dy = this.from.y - this.to.y;
+      const angle = -Math.atan2(dy, dx) - HALF_PI;
+      const xx = NODE_RADIUS * Math.sin(angle);
+      const yy = NODE_RADIUS * Math.cos(angle);
+
+      const endX = this.to.x - xx;
+      const endY = this.to.y - yy;
+      return [endX, endY];
+    }
+    else
+    {
+      const midpoint = this.getMidPoint();
+      const quadX = midpoint[0] + (this.quad.x * 2);
+      const quadY = midpoint[1] + (this.quad.y * 2);
+
+      const dx = quadX - this.to.x;
+      const dy = quadY - this.to.y;
+      const angle = -Math.atan2(dy, dx) - HALF_PI + (this.isSelfLoop() ? -FOURTH_PI : 0);
+      const xx = NODE_RADIUS * Math.sin(angle);
+      const yy = NODE_RADIUS * Math.cos(angle);
+
+      const result = midpoint;
+      result[0] = this.to.x - xx;
+      result[1] = this.to.y - yy;
+      return result;
+    }
+  }
+
+  /**
+  * Returns the midpoint between states from and to, which may not be on the curve
+  */
+  getMidPoint()
+  {
+    const mx = this.from.x + (this.to.x - this.from.x) / 2;
+    const my = this.from.y + (this.to.y - this.from.y) / 2;
+    return [mx, my];
   }
 
   get centerX() { return this.from.x + (this.to.x - this.from.x) / 2; }

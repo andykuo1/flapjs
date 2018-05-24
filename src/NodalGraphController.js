@@ -137,6 +137,7 @@ class NodalGraphController
 
     //Hover information...
     if (selectState == null) selectState = this.getEdgeByPosition(this.mouse.x, this.mouse.y);
+    if (selectState == null) selectState = this.getEdgeEndPointByPosition(this.mouse.x, this.mouse.y);
     if (selectState != null)
     {
       NodalGraphRenderer.drawHoverCircle(ctx, selectState.x, selectState.y, NODE_RADIUS + 4);
@@ -261,6 +262,22 @@ class NodalGraphController
     {
       const dx = x - edge.x;
       const dy = y - edge.y;
+      if (dx * dx + dy * dy < EDGE_RADIUS_SQU)
+      {
+        return edge;
+      }
+    }
+
+    return null;
+  }
+
+  getEdgeEndPointByPosition(x, y)
+  {
+    for(const edge of this.graph.edges)
+    {
+      const point = edge.getEndPoint();
+      const dx = x - point[0];
+      const dy = y - point[1];
       if (dx * dx + dy * dy < EDGE_RADIUS_SQU)
       {
         return edge;
