@@ -10,11 +10,12 @@ class NodalGraphController
     this.mouse = mouse;
     this.graph = graph;
 
+    this.moveMode = false;
     this.targetMode = null;
+    this.targetSource = null;
     this.targetDestination = null;
     this.proxyEdge = new Edge(null, null, "");
 
-    this.targetSource = null;
     this.prevMouse = { x: 0, y: 0 };
 
     this.moveTarget = null;
@@ -26,28 +27,14 @@ class NodalGraphController
   load()
   {
     this.mouse.on('mousedown', (mouse, button) => {
-      if (button == 3)
-      {
-        //Move target?
-        this.startMove(mouse.x, mouse.y);
-      }
-      else
-      {
-        this.markTarget(mouse.x, mouse.y);
-      }
+      this.moveMode = (button == 3);
+      this.markTarget(mouse.x, mouse.y);
       this.prevMouse.x = mouse.x;
       this.prevMouse.y = mouse.y;
     });
     this.mouse.on('mouseup', (mouse, button) => {
-      if (button == 3)
-      {
-        //Finish moving target?
-        this.endMove(mouse.x, mouse.y);
-      }
-      else
-      {
-        this.releaseTarget(mouse.x, mouse.y);
-      }
+      this.moveMode = (button == 3);
+      this.releaseTarget(mouse.x, mouse.y);
       this.prevMouse.x = mouse.x;
       this.prevMouse.y = mouse.y;
     });
@@ -81,7 +68,7 @@ class NodalGraphController
     //TODO: Drawing the graph info...
 
     //Get hover information...
-    let selectTarget = this.getStateByPosition(this.mouse.x, this.mouse.y);
+    let selectTarget = this.targetDestination = this.getStateByPosition(this.mouse.x, this.mouse.y);
     let selectType = "state";
 
     this.targetDestination = selectTarget;
@@ -221,80 +208,84 @@ class NodalGraphController
 
   markTarget(x, y)
   {
-    this.targetSource = this.getStateByPosition(x, y);
-    this.isSelfMode = true;
+    if (this.moveMode)
+    {
+      if (this.moveTarget = this.getEdgeByPosition(x, y))
+      {
+        this.moveTargetType = "edge";
+      }
+      else if (this.moveTarget = this.getStateByPosition(x, y))
+      {
+        this.moveTargetType = "state";
+      }
+      else if (this.moveTarget = this.getEdgeEndPointByPosition(x, y))
+      {
+        this.moveTargetType = "endpoint";
+      }
+      else
+      {
+        this.moveGraph = { x: this.mouse.x, y: this.mouse.y };
+      }
+    }
+    else
+    {
+      this.targetSource = this.getStateByPosition(x, y);
+      this.isSelfMode = true;
+    }
   }
 
   releaseTarget(x, y)
   {
-    //If did not click on anything...
-    if (this.targetSource == null)
+    if (this.moveMode)
     {
-      //If click, create node at mouse position...
-      const dx = x - this.prevMouse.x;
-      const dy = y - this.prevMouse.y;
-
-      //Check if it is a click, not a drag...
-      if (dx * dx + dy * dy < CLICK_RADIUS_SQU)
+      if (this.moveTarget != null)
       {
-        const node = this.graph.createNewNode();
-        node.x = x - this.graph.centerX;
-        node.y = y - this.graph.centerY;
-        node.accept = false;
+        this.resolveMove();
+        this.moveTarget = null;
       }
-      return;
-    }
 
-    const target = this.getStateByPosition(x, y);
-    if (!this.isSelfMode && this.targetDestination != null)
-    {
-      this.createNewTransition(this.targetSource, this.targetDestination);
-    }
-    else if (target == this.targetSource)
-    {
-      this.graph.toggleAcceptState(target);
-    }
+      if (this.moveGraph != null)
+      {
+        this.graph.offsetX = this.mouse.x - this.moveGraph.x;
+        this.graph.offsetY = this.mouse.y - this.moveGraph.y;
 
-    this.targetSource = null;
-    this.targetDestination = null;
-  }
+        //TODO: Limit how far you can move the graph...
 
-  startMove(x, y)
-  {
-    if (this.moveTarget = this.getEdgeByPosition(x, y))
-    {
-      this.moveTargetType = "edge";
-    }
-    else if (this.moveTarget = this.getStateByPosition(x, y))
-    {
-      this.moveTargetType = "state";
-    }
-    else if (this.moveTarget = this.getEdgeEndPointByPosition(x, y))
-    {
-      this.moveTargetType = "endpoint";
+        this.moveGraph = null;
+      }
     }
     else
     {
-      this.moveGraph = { x: this.mouse.x, y: this.mouse.y };
-    }
-  }
+      //If did not click on anything...
+      if (this.targetSource == null)
+      {
+        //If click, create node at mouse position...
+        const dx = x - this.prevMouse.x;
+        const dy = y - this.prevMouse.y;
 
-  endMove(x, y)
-  {
-    if (this.moveTarget != null)
-    {
-      this.resolveMove();
-      this.moveTarget = null;
-    }
+        //Check if it is a click, not a drag...
+        if (dx * dx + dy * dy < CLICK_RADIUS_SQU)
+        {
+          const node = this.graph.createNewNode();
+          node.x = x - this.graph.centerX;
+          node.y = y - this.graph.centerY;
+          node.accept = false;
+        }
+        return;
+      }
 
-    if (this.moveGraph != null)
-    {
-      this.graph.offsetX = this.mouse.x - this.moveGraph.x;
-      this.graph.offsetY = this.mouse.y - this.moveGraph.y;
+      const target = this.getStateByPosition(x, y);
+      if (!this.isSelfMode && this.targetDestination != null)
+      {
+        this.createNewTransition(this.targetSource, this.targetDestination);
+      }
+      else if (target == this.targetSource)
+      {
+        this.graph.toggleAcceptState(target);
+      }
 
-      //TODO: Limit how far you can move the graph...
-
-      this.moveGraph = null;
+      this.targetSource = null;
+      this.targetDestination = null;
     }
   }
 
