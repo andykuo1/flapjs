@@ -78,7 +78,7 @@ export class NodalGraph
   destroyEdge(edge)
   {
     this.edges.splice(this.edges.indexOf(edge), 1);
-    this.emit("edgeDestroy", result);
+    this.emit("edgeDestroy", edge);
   }
 
   clear()
@@ -286,7 +286,6 @@ export class Edge
     if (Math.abs(this.quad.x) < 8) this.quad.x = 0;
     if (this.quad.x == 0 && this.quad.y == 0) this.quad = null;
   }
-
   set y(value) {
     if (this.quad == null) this.quad = {x: 0, y: 0};
     this.quad.y = value - this.centerY;
