@@ -337,7 +337,7 @@ class NodalGraphController
     {
       const dx = x - node.x;
       const dy = y - node.y;
-      if (dx * dx + dy * dy < RADIUS_SQU)
+      if (dx * dx + dy * dy < NODE_RADIUS_SQU)
       {
         return node;
       }
