@@ -50,7 +50,7 @@ export class NodalGraph
   createNewEdge(from, to)
   {
     const result = new Edge(this, from, to);
-    if (from == to) result.y = from.y - SELF_LOOP_HEIGHT;
+    if (result.isSelfLoop()) result.y = from.y - SELF_LOOP_HEIGHT;
     this.edges.push(result);
     this.emit("edgeCreate", result);
     return result;

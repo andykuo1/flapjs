@@ -170,13 +170,35 @@ function drawEdge(ctx, edge)
   ctx.stroke();
   ctx.closePath();
 
+  //Draw multiple labels
   if (label.length > 0)
   {
-    let xx = quad == null ? centerX : x;
-    let yy = quad == null ? centerY : y + (8 * Math.sign(quad.y));
-    const cx = label.length * 3;
-    ctx.clearRect(xx - cx - 2, yy - 5, (cx * 2) + 4, 10);
-    ctx.fillText(label, xx, yy + 4);
+    const labels = label.split(" ");
+    let dy = 0;
+    for(let str of labels)
+    {
+      let xx = 0;
+      let yy = 0;
+      let cx = str.length * 3;
+      let sign = 0;
+
+      if (quad == null)
+      {
+        xx = centerX;
+        yy = centerY;
+      }
+      else
+      {
+        sign = Math.sign(quad.y);
+        xx = x;
+        yy = y + (8 * sign);
+      }
+
+      yy += dy * (-sign || 1);
+      ctx.clearRect(xx - cx - 2, yy - 5, (cx * 2) + 4, 10);
+      ctx.fillText(str, xx, yy + 4);
+      dy -= 12;
+    }
   }
 }
 
