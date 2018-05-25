@@ -13,8 +13,6 @@ export class NodalGraph
     this.nodes = [];
     this.edges = [];
 
-    this.graphLabelStates = document.getElementById("graph-states");
-
     this.canvas = canvas;
     this._offsetX = 0;
     this._offsetY = 0;
@@ -30,23 +28,6 @@ export class NodalGraph
 
   set offsetX(value) { this.nextOffsetX = value; }
   set offsetY(value) { this.nextOffsetY = value; }
-
-  onCreateNode(node)
-  {
-    const element = document.createElement("label");
-    element.setAttribute("contenteditable", "true");
-    element.addEventListener('input', (event) => {
-      node.label = element.textContent;
-    });
-    element.innerHTML = node.label;
-    node._element = element;
-    this.graphLabelStates.appendChild(element);
-  }
-
-  onDestroyNode(node)
-  {
-    this.graphLabelStates.removeChild(node._element);
-  }
 
   createNewNode()
   {
@@ -142,8 +123,6 @@ export class Node
     this.nextX = x;
     this.nextY = y;
     this.accept = false;
-
-    this._dirty = true;
   }
 
   get x() { return this._x + this.graph.centerX; }
@@ -169,7 +148,6 @@ export class Edge
     this.to = to;
 
     this.quad = null;
-    this._dirty = true;
   }
 
   /**

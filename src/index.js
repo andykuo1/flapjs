@@ -26,10 +26,12 @@ function onAnimationFrame(time)
 import NodalGraphController from 'NodalGraphController.js';
 import NodalGraphRenderer from 'NodalGraphRenderer.js';
 import NodalGraphSorter from 'NodalGraphSorter.js';
+import NodalGraphExporter from 'NodalGraphExporter.js';
 import { NodalGraph } from 'NodalGraph.js';
 
 const graph = new NodalGraph(canvas);
 const controller = new NodalGraphController(canvas, mouse, graph);
+const exporter = new NodalGraphExporter(graph);
 
 function onCanvasLoad()
 {
