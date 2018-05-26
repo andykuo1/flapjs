@@ -152,12 +152,10 @@ class NodalGraphController
 
   createNewState(x, y)
   {
-    const xx = x || (Math.random() * SPAWN_RADIUS * 2) - SPAWN_RADIUS;
-    const yy = y || (Math.random() * SPAWN_RADIUS * 2) - SPAWN_RADIUS;
     const node = this.graph.createNewNode();
     node.label = "q" + (this.graph.nodes.length - 1);
-    node.x = xx;
-    node.y = yy;
+    node.x = x || (Math.random() * SPAWN_RADIUS * 2) - SPAWN_RADIUS;
+    node.y = y || (Math.random() * SPAWN_RADIUS * 2) - SPAWN_RADIUS;
     return node;
   }
 
