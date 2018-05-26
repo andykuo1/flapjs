@@ -14,11 +14,15 @@ class NodalGraphController
     this.labelEditorInput.addEventListener('keyup', (e) => {
       if (e.keyCode == 13)
       {
-        this.closeLabelEditor();
+        this.closeLabelEditor(true);
+      }
+      else if (e.keyCode == 27)
+      {
+        this.closeLabelEditor(false);
       }
     });
     this.labelEditorInput.addEventListener('blur', (e) => {
-      this.closeLabelEditor();
+      this.closeLabelEditor(false);
     })
     this.labelEditorSource = null;
 
@@ -168,7 +172,7 @@ class NodalGraphController
 
   markTarget(x, y)
   {
-    if (this.closeLabelEditor())
+    if (this.closeLabelEditor(false))
     {
       this.targetSource = null;
       this.targetDestination = null;
@@ -367,11 +371,14 @@ class NodalGraphController
     return false;
   }
 
-  closeLabelEditor()
+  closeLabelEditor(shouldSave)
   {
     if (this.labelEditorSource != null)
     {
-      this.labelEditorSource.label = this.labelEditorInput.value;
+      if (shouldSave)
+      {
+        this.labelEditorSource.label = this.labelEditorInput.value;
+      }
 
       this.labelEditor.style.visibility = "hidden";
       this.labelEditorSource = null;
