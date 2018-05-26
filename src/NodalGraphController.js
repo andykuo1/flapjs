@@ -150,14 +150,14 @@ class NodalGraphController
     }
   }
 
-  createNewState()
+  createNewState(x, y)
   {
-    const x = (Math.random() * SPAWN_RADIUS * 2) - SPAWN_RADIUS;
-    const y = (Math.random() * SPAWN_RADIUS * 2) - SPAWN_RADIUS;
+    const xx = x || (Math.random() * SPAWN_RADIUS * 2) - SPAWN_RADIUS;
+    const yy = y || (Math.random() * SPAWN_RADIUS * 2) - SPAWN_RADIUS;
     const node = this.graph.createNewNode();
-    node.x = x;
-    node.y = y;
-    node.accept = false;
+    node.label = "q" + (this.graph.nodes.length - 1);
+    node.x = xx;
+    node.y = yy;
     return node;
   }
 
@@ -273,10 +273,7 @@ class NodalGraphController
         //Check if it is a click, not a drag...
         if (dx * dx + dy * dy < CURSOR_RADIUS_SQU)
         {
-          const node = this.graph.createNewNode();
-          node.x = x - this.graph.centerX;
-          node.y = y - this.graph.centerY;
-          node.accept = false;
+          this.createNewState(x - this.graph.centerX, y - this.graph.centerY);
         }
       }
     }
