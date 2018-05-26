@@ -48,7 +48,7 @@ function onCanvasLoad()
   node2.y = 0;
   node2.label = "q1";
   edge = graph.createNewEdge(node, node2);
-  edge.label = "abc";
+  edge.label = "abc 0";
 
   controller.load();
 }

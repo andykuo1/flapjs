@@ -9,6 +9,18 @@ class NodalGraphController
     this.canvas = canvas;
     this.mouse = mouse;
     this.graph = graph;
+    this.labelEditor = document.getElementById("label-editor");
+    this.labelEditorInput = document.getElementById("label-editor-input");
+    this.labelEditorInput.addEventListener('keyup', (e) => {
+      if (e.keyCode == 13)
+      {
+        this.closeLabelEditor();
+      }
+    });
+    this.labelEditorInput.addEventListener('blur', (e) => {
+      this.closeLabelEditor();
+    })
+    this.labelEditorSource = null;
 
     this.moveMode = false;
     this.targetMode = null;
@@ -70,13 +82,13 @@ class NodalGraphController
       //Start creating edges if cursor leaves state...
       if (this.targetSource != this.targetDestination)
       {
-        this.targetMode = "edge";
+        this.targetMode = "create-edge";
         this.proxyEdge.from = this.targetSource;
       }
     }
 
     //If is creating edges and NOT toggling accept state...
-    if (this.targetMode == "edge")
+    if (this.targetMode == "create-edge")
     {
       this.resolveEdge(this.proxyEdge);
 
@@ -158,6 +170,14 @@ class NodalGraphController
 
   markTarget(x, y)
   {
+    if (this.closeLabelEditor())
+    {
+      this.targetSource = null;
+      this.targetDestination = null;
+      this.targetMode = "label-edit";
+      return;
+    }
+
     if (this.moveMode)
     {
       if (this.targetSource = this.getEdgeByPosition(x, y))
@@ -224,6 +244,10 @@ class NodalGraphController
       }
       else if (this.targetMode == "edge")
       {
+        this.openLabelEditor(this.targetSource);
+      }
+      else if (this.targetMode == "create-edge")
+      {
         if (this.targetDestination != null)
         {
           const transition = this.createNewTransition(this.targetSource, this.targetDestination);
@@ -238,9 +262,8 @@ class NodalGraphController
       {
         //Left click endpoint?
       }
-
       //If did not click on anything...
-      else if (this.targetSource == null)
+      else if (this.targetMode == null && this.targetSource == null)
       {
         //If click, create node at mouse position...
         const dx = x - this.prevMouse.x;
@@ -329,6 +352,35 @@ class NodalGraphController
       this.graph.offsetX = this.mouse.x - this.targetSource.x;
       this.graph.offsetY = this.mouse.y - this.targetSource.y;
     }
+  }
+
+  openLabelEditor(source)
+  {
+    if (this.labelEditorSource != source)
+    {
+      this.labelEditor.style.left = (source.x - this.labelEditor.offsetWidth / 2) + 'px';
+      this.labelEditor.style.top = (source.y - this.labelEditor.offsetHeight / 2) + 'px';
+      this.labelEditorInput.value = source.label;
+
+      this.labelEditor.style.visibility = "visible";
+      this.labelEditorSource = source;
+      this.labelEditorInput.focus();
+      return true;
+    }
+    return false;
+  }
+
+  closeLabelEditor()
+  {
+    if (this.labelEditorSource != null)
+    {
+      this.labelEditorSource.label = this.labelEditorInput.value;
+
+      this.labelEditor.style.visibility = "hidden";
+      this.labelEditorSource = null;
+      return true;
+    }
+    return false;
   }
 
   getStateByPosition(x, y)
