@@ -256,6 +256,7 @@ class NodalGraphController
             transition.x = this.proxyEdge.x;
             transition.y = this.proxyEdge.y;
           }
+          this.openLabelEditor(transition);
         }
       }
       else if (this.targetMode == "endpoint")
@@ -365,6 +366,7 @@ class NodalGraphController
       this.labelEditor.style.visibility = "visible";
       this.labelEditorSource = source;
       this.labelEditorInput.focus();
+      this.labelEditorInput.select();
       return true;
     }
     return false;
