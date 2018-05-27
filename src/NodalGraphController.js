@@ -1,10 +1,12 @@
 import { Edge } from 'NodalGraph.js';
 import NodalGraphRenderer from 'NodalGraphRenderer.js';
 import NodalGraphSorter from 'NodalGraphSorter.js';
-import MoveController from 'MoveController.js';
-import LabelController from 'LabelController.js';
-import HoverController from 'HoverController.js';
+
 import GraphCursor from 'GraphCursor.js';
+import LabelEditor from 'controller/LabelEditor.js';
+
+import MoveController from 'controller/MoveController.js';
+import HoverController from 'controller/HoverController.js';
 
 class NodalGraphController
 {
@@ -15,8 +17,9 @@ class NodalGraphController
     this.graph = graph;
 
     this.cursor = new GraphCursor(graph, mouse);
+    this.labelEditor = new LabelEditor();
+
     this.moveController = new MoveController(graph, this.cursor);
-    this.labelController = new LabelController(graph);
     this.hoverController = new HoverController(graph, this.cursor);
 
     this.moveMode = false;
@@ -120,7 +123,7 @@ class NodalGraphController
 
   markTarget(x, y)
   {
-    if (this.labelController.closeLabelEditor(false))
+    if (this.labelEditor.close(false))
     {
       this.cursor.targetSource = null;
       this.cursor.targetDestination = null;
@@ -168,7 +171,7 @@ class NodalGraphController
       }
       else if (this.cursor.targetMode == "edge")
       {
-        this.labelController.openLabelEditor(this.cursor.targetSource);
+        this.labelEditor.open(this.cursor.targetSource);
       }
       else if (this.cursor.targetMode == "create-edge")
       {
@@ -180,7 +183,7 @@ class NodalGraphController
             transition.x = this.proxyEdge.x;
             transition.y = this.proxyEdge.y;
           }
-          this.labelController.openLabelEditor(transition);
+          this.labelEditor.open(transition);
         }
       }
       else if (this.cursor.targetMode == "endpoint")
