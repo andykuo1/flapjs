@@ -1,4 +1,3 @@
-import { Edge } from 'NodalGraph.js';
 import NodalGraphRenderer from 'NodalGraphRenderer.js';
 
 class EditController
@@ -13,8 +12,6 @@ class EditController
     this.target = null;
     this.targetMode = null;
     this.targetEdge = null;
-    
-    this.prevMouse = { x: 0, y: 0 };
   }
 
   createNewState(x, y)
@@ -52,9 +49,6 @@ class EditController
       this.target = null;
       this.targetMode = null;
     }
-
-    this.prevMouse.x = x;
-    this.prevMouse.y = y;
   }
 
   updateEdit(ctx, x, y)
@@ -96,19 +90,6 @@ class EditController
     else if (this.targetMode == "endpoint")
     {
       //Left click endpoint?
-    }
-    //If did not click on anything...
-    else if (this.targetMode == null && this.target == null)
-    {
-      //If click, create node at mouse position...
-      const dx = x - this.prevMouse.x;
-      const dy = y - this.prevMouse.y;
-
-      //Check if it is a click, not a drag...
-      if (dx * dx + dy * dy < CURSOR_RADIUS_SQU)
-      {
-        this.createNewState(x - this.graph.centerX, y - this.graph.centerY);
-      }
     }
 
     this.target = null;

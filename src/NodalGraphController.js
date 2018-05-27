@@ -1,4 +1,3 @@
-import { Edge } from 'NodalGraph.js';
 import NodalGraphRenderer from 'NodalGraphRenderer.js';
 import NodalGraphSorter from 'NodalGraphSorter.js';
 
@@ -83,15 +82,11 @@ class NodalGraphController
 
   markTarget(x, y)
   {
-    if (this.labelEditor.isOpen())
-    {
-      return;
-    }
+    if (this.labelEditor.isOpen()) return;
 
     if (this.moveMode)
     {
       this.moveController.beginMove(x, y);
-      this.cursor.targetMode = "move";
     }
     else
     {
