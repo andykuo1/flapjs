@@ -79,8 +79,11 @@ class NodalGraphController
 
   draw(ctx, dt)
   {
+    const mx = this.mouse.x;
+    const my = this.mouse.y;
+
     //Get hovered states
-    this.cursor.targetDestination = this.cursor.getNodeAt(this.mouse.x, this.mouse.y);
+    this.cursor.targetDestination = this.cursor.getNodeAt(mx, my);
 
     //If clicked on state...
     if (this.cursor.targetMode == "state")
@@ -96,7 +99,7 @@ class NodalGraphController
     //If is creating edges and NOT toggling accept state...
     if (this.cursor.targetMode == "create-edge")
     {
-      this.moveController.resolveEdge(this.proxyEdge);
+      this.moveController.resolveEdge(mx, my, this.proxyEdge);
 
       //Draw the proxy edge
       NodalGraphRenderer.drawEdges(ctx, this.proxyEdge);
@@ -105,7 +108,7 @@ class NodalGraphController
     //Update the moving target if dragging object...
     if (this.cursor.targetMode && this.cursor.targetMode.startsWith("move"))
     {
-      this.moveController.updateMove(this.mouse.x, this.mouse.y);
+      this.moveController.updateMove(mx, my);
     }
 
     //Hover information...
@@ -116,11 +119,11 @@ class NodalGraphController
     {
       selectMode = "state";
     }
-    else if (targetSelect = this.cursor.getEdgeAt(this.mouse.x, this.mouse.y))
+    else if (targetSelect = this.cursor.getEdgeAt(mx, my))
     {
       selectMode = "edge";
     }
-    else if (targetSelect = this.cursor.getEdgeByEndPointAt(this.mouse.x, this.mouse.y))
+    else if (targetSelect = this.cursor.getEdgeByEndPointAt(mx, my))
     {
       selectMode = "endpoint";
     }
@@ -149,8 +152,8 @@ class NodalGraphController
           r = ENDPOINT_RADIUS;
           break;
         default:
-          x = this.mouse.x;
-          y = this.mouse.y;
+          x = mx;
+          y = my;
       }
       NodalGraphRenderer.drawHoverCircle(ctx, x, y, r + HOVER_RADIUS_OFFSET);
     }

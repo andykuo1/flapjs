@@ -55,7 +55,7 @@ class MoveController
     }
     else if (this.cursor.targetMode == "move-endpoint")
     {
-      this.resolveEdge(this.cursor.targetSource);
+      this.resolveEdge(x, y, this.cursor.targetSource);
     }
     else if (this.cursor.targetMode == "move-state")
     {
@@ -92,16 +92,16 @@ class MoveController
     }
   }
 
-  resolveEdge(edge)
+  resolveEdge(x, y, edge)
   {
-    edge.to = this.cursor.targetDestination || this.mouse;
+    edge.to = this.cursor.targetDestination || this.cursor.mouse;
 
     //If the cursor returns to the state after leaving it...
     if (edge.isSelfLoop())
     {
       //Make it a self loop
-      const dx = edge.from.x - this.mouse.x;
-      const dy = edge.from.y - this.mouse.y;
+      const dx = edge.from.x - x;
+      const dy = edge.from.y - y;
       const angle = Math.atan2(dy, dx);
       edge.x = edge.from.x - Math.cos(angle) * SELF_LOOP_HEIGHT;
       edge.y = edge.from.y - Math.sin(angle) * SELF_LOOP_HEIGHT;
