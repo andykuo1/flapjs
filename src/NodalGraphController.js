@@ -1,4 +1,3 @@
-import NodalGraphRenderer from 'NodalGraphRenderer.js';
 import NodalGraphSorter from 'NodalGraphSorter.js';
 
 import GraphCursor from 'GraphCursor.js';

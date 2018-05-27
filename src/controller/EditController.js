@@ -1,4 +1,5 @@
 import NodalGraphRenderer from 'NodalGraphRenderer.js';
+import SelectionController from 'controller/SelectionController.js';
 
 class EditController
 {
@@ -8,6 +9,7 @@ class EditController
     this.cursor = cursor;
     this.labelEditor = labelEditor;
     this.moveController = moveController;
+    this.selectionController = new SelectionController(graph);
 
     this.target = null;
     this.targetMode = null;
@@ -47,7 +49,9 @@ class EditController
     else
     {
       this.target = null;
-      this.targetMode = null;
+      this.targetMode = "selection";
+
+      this.selectionController.beginSelection(x, y);
     }
   }
 
@@ -65,6 +69,10 @@ class EditController
 
         this.moveController.moveEndPoint(this.targetEdge);
       }
+    }
+    else if (this.targetMode == "selection")
+    {
+      this.selectionController.updateSelection(ctx, x, y);
     }
   }
 
@@ -90,6 +98,10 @@ class EditController
     else if (this.targetMode == "endpoint")
     {
       //Left click endpoint?
+    }
+    else if (this.targetMode == "selection")
+    {
+      this.selectionController.endSelection(x, y);
     }
 
     this.target = null;
