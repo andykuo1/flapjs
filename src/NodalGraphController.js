@@ -3,6 +3,7 @@ import NodalGraphRenderer from 'NodalGraphRenderer.js';
 import NodalGraphSorter from 'NodalGraphSorter.js';
 import MoveController from 'MoveController.js';
 import LabelController from 'LabelController.js';
+import HoverController from 'HoverController.js';
 import GraphCursor from 'GraphCursor.js';
 
 class NodalGraphController
@@ -16,6 +17,7 @@ class NodalGraphController
     this.cursor = new GraphCursor(graph, mouse);
     this.moveController = new MoveController(graph, this.cursor);
     this.labelController = new LabelController(graph);
+    this.hoverController = new HoverController(graph, this.cursor);
 
     this.moveMode = false;
     this.proxyEdge = new Edge(null, null, "");
@@ -96,52 +98,8 @@ class NodalGraphController
       this.moveController.updateMove(mx, my);
     }
 
-    //Hover information...
-    let targetSelect = null;
-    let selectMode = null;
-
-    if (targetSelect = this.cursor.targetDestination)
-    {
-      selectMode = "state";
-    }
-    else if (targetSelect = this.cursor.getEdgeAt(mx, my))
-    {
-      selectMode = "edge";
-    }
-    else if (targetSelect = this.cursor.getEdgeByEndPointAt(mx, my))
-    {
-      selectMode = "endpoint";
-    }
-
-    if (targetSelect != null)
-    {
-      let x = 0;
-      let y = 0;
-      let r = CURSOR_RADIUS;
-      switch(selectMode)
-      {
-        case "state":
-          x = targetSelect.x;
-          y = targetSelect.y;
-          r = NODE_RADIUS;
-          break;
-        case "edge":
-          x = targetSelect.x;
-          y = targetSelect.y;
-          r = EDGE_RADIUS;
-          break;
-        case "endpoint":
-          const endpoint = targetSelect.getEndPoint();
-          x = endpoint[0];
-          y = endpoint[1];
-          r = ENDPOINT_RADIUS;
-          break;
-        default:
-          x = mx;
-          y = my;
-      }
-      NodalGraphRenderer.drawHoverCircle(ctx, x, y, r + HOVER_RADIUS_OFFSET);
-    }
+    //Draw hover
+    this.hoverController.draw(ctx, dt);
   }
 
   createNewState(x, y)
