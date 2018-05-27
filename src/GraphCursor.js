@@ -7,6 +7,12 @@ class GraphCursor //mixin Eventable
     this.graph = graph;
     this.mouse = mouse;
 
+    this.prevTargetX = 0;
+    this.prevTargetY = 0;
+    this.prevTargetNode = null;
+    this.prevTargetEdge = null;
+    this.prevTargetEndPoint = null;
+
     this.targetSource = null;
     this.targetDestination = null;
     this.targetMode = null;
@@ -29,6 +35,8 @@ class GraphCursor //mixin Eventable
 
   getEdgeAt(x, y)
   {
+    //if (this.prevTargetX == x && this.prevTargetY == y) return this.prevTargetEdge;
+
     for(const edge of this.graph.edges)
     {
       const dx = x - edge.x;
@@ -44,6 +52,8 @@ class GraphCursor //mixin Eventable
 
   getEdgeByEndPointAt(x, y)
   {
+    //if (this.prevTargetX == x && this.prevTargetY == y) return this.prevTargetEndPoint;
+
     for(const edge of this.graph.edges)
     {
       const point = edge.getEndPoint();

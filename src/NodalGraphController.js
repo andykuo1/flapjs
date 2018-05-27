@@ -6,6 +6,7 @@ import GraphCursor from 'GraphCursor.js';
 import LabelEditor from 'controller/LabelEditor.js';
 
 import MoveController from 'controller/MoveController.js';
+import EditController from 'controller/EditController.js';
 import HoverController from 'controller/HoverController.js';
 
 class NodalGraphController
@@ -20,6 +21,7 @@ class NodalGraphController
     this.labelEditor = new LabelEditor();
 
     this.moveController = new MoveController(graph, this.cursor);
+    this.editController = new EditController(graph, this.cursor);
     this.hoverController = new HoverController(graph, this.cursor);
 
     this.moveMode = false;
@@ -96,13 +98,13 @@ class NodalGraphController
     }
 
     //Update the moving target if dragging object...
-    if (this.cursor.targetMode && this.cursor.targetMode.startsWith("move"))
+    if (this.moveController.isMoving())
     {
       this.moveController.updateMove(mx, my);
     }
 
     //Draw hover
-    this.hoverController.draw(ctx, dt);
+    this.hoverController.draw(ctx);
   }
 
   createNewState(x, y)
@@ -123,8 +125,9 @@ class NodalGraphController
 
   markTarget(x, y)
   {
-    if (this.labelEditor.close(false))
+    if (this.labelEditor.isOpen())
     {
+      this.labelEditor.close(false);
       this.cursor.targetSource = null;
       this.cursor.targetDestination = null;
       this.cursor.targetMode = "label-edit";
@@ -134,6 +137,7 @@ class NodalGraphController
     if (this.moveMode)
     {
       this.moveController.beginMove(x, y);
+      this.cursor.targetMode = "move";
     }
     else
     {

@@ -8,7 +8,7 @@ class HoverController
     this.cursor = cursor;
   }
 
-  draw(ctx, dt)
+  draw(ctx)
   {
     const mx = this.cursor.mouse.x;
     const my = this.cursor.mouse.y;

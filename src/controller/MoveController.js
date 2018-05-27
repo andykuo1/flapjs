@@ -4,92 +4,141 @@ class MoveController
   {
     this.graph = graph;
     this.cursor = cursor;
-    this.mouse = this.cursor.mouse;
 
-    this.prevEdgeQuad = null;
+    this.target = null;
+    this.targetMode = null;
+
+    this.targetQuad = null;
+    this.targetGraphX = 0;
+    this.targetGraphY = 0;
+  }
+
+  moveNode(node)
+  {
+    this.target = node;
+    this.targetMode = "node";
+  }
+
+  moveEdge(edge)
+  {
+    this.target = edge;
+    this.targetMode = "edge";
+  }
+
+  moveEndPoint(edge)
+  {
+    this.target = edge;
+    this.targetMode = "endpoint";
+    const quad = this.target.quad;
+    if (quad != null)
+    {
+      this.targetQuad = { x: quad.x, y: quad.y};
+    }
+    else
+    {
+      this.targetQuad = null;
+    }
+
+    this.cursor.targetMode = "nodeOnly";
+  }
+
+  moveGraph(fromX, fromY)
+  {
+    this.target = null;
+    this.targetGraphX = fromX;
+    this.targetGraphY = fromY;
+    this.targetMode = "graph";
   }
 
   beginMove(x, y)
   {
-    if (this.cursor.targetSource = this.cursor.getEdgeAt(x, y))
+    let target = null;
+    if (target = this.cursor.getNodeAt(x, y))
     {
-      this.cursor.targetMode = "move-edge";
+      this.moveNode(target);
     }
-    else if (this.cursor.targetSource = this.cursor.getNodeAt(x, y))
+    else if (target = this.cursor.getEdgeAt(x, y))
     {
-      this.cursor.targetMode = "move-state";
+      this.moveEdge(target);
     }
-    else if (this.cursor.targetSource = this.cursor.getEdgeByEndPointAt(x, y))
+    else if (target = this.cursor.getEdgeByEndPointAt(x, y))
     {
-      this.cursor.targetMode = "move-endpoint";
-      const quad = this.cursor.targetSource.quad;
-      if (quad != null)
-      {
-        this.prevEdgeQuad = { x: quad.x, y: quad.y};
-      }
-      else
-      {
-        this.prevEdgeQuad = null;
-      }
+      this.moveEndPoint(target);
     }
     else
     {
-      this.cursor.targetSource = { x: x, y: y };
-      this.cursor.targetMode = "move-graph";
+      this.moveGraph(x, y);
     }
   }
 
   updateMove(x, y)
   {
-    if (this.cursor.targetMode == null) return;
-    if (this.cursor.targetSource == null)
-    {
-      throw new Error("Trying to resolve target mode \'" + this.cursor.targetMode + "\' with missing source");
-    }
+    if (this.targetMode == null) return;
 
     //Readjust render position for graph offset
-    if (this.cursor.targetMode == "move-edge")
+    if (this.targetMode == "edge")
     {
-      this.cursor.targetSource.x = x;
-      this.cursor.targetSource.y = y;
+      if (this.target == null)
+      {
+        throw new Error("Trying to resolve target mode \'" + this.targetMode + "\' with missing source");
+      }
+
+      this.target.x = x;
+      this.target.y = y;
     }
-    else if (this.cursor.targetMode == "move-endpoint")
+    else if (this.targetMode == "endpoint")
     {
-      this.resolveEdge(x, y, this.cursor.targetSource);
+      if (this.target == null)
+      {
+        throw new Error("Trying to resolve target mode \'" + this.targetMode + "\' with missing source");
+      }
+
+      this.resolveEdge(x, y, this.target);
     }
-    else if (this.cursor.targetMode == "move-state")
+    else if (this.targetMode == "node")
     {
-      this.cursor.targetSource.x = x - this.graph.centerX;
-      this.cursor.targetSource.y = y - this.graph.centerY;
+      if (this.target == null)
+      {
+        throw new Error("Trying to resolve target mode \'" + this.targetMode + "\' with missing source");
+      }
+
+      this.target.x = x - this.graph.centerX;
+      this.target.y = y - this.graph.centerY;
     }
-    else if (this.cursor.targetMode == "move-graph")
+    else if (this.targetMode == "graph")
     {
       //Move the graph if draggin empty...
-      this.graph.offsetX = x - this.cursor.targetSource.x;
-      this.graph.offsetY = y - this.cursor.targetSource.y;
+      this.graph.offsetX = x - this.targetGraphX;
+      this.graph.offsetY = y - this.targetGraphY;
     }
   }
 
   endMove(x, y)
   {
-    if (this.cursor.targetMode == null) return;
-    if (this.cursor.targetSource == null)
-    {
-      throw new Error("Trying to resolve target mode \'" + this.cursor.targetMode + "\' with missing source");
-    }
+    if (this.targetMode == null) return;
 
     this.updateMove(x, y);
 
-    if (this.cursor.targetMode == "move-endpoint")
+    if (this.targetMode == "endpoint")
     {
+      if (this.target == null)
+      {
+        throw new Error("Trying to resolve target mode \'" + this.targetMode + "\' with missing source");
+      }
+
       if (this.cursor.targetDestination == null)
       {
         //Delete it...
-        this.graph.destroyEdge(this.cursor.targetSource);
+        this.graph.destroyEdge(this.target);
       }
 
-      this.prevEdgeQuad = null;
+      this.targetQuad = null;
+
+      this.cursor.targetMode = null;
     }
+
+    this.target = null;
+    this.targetMode = null;
   }
 
   resolveEdge(x, y, edge)
@@ -108,17 +157,22 @@ class MoveController
     }
     else
     {
-      if (this.prevEdgeQuad != null)
+      if (this.targetQuad != null)
       {
         if (edge.quad == null) edge.quad = { x: 0, y: 0 };
-        edge.quad.x = this.prevEdgeQuad.x;
-        edge.quad.y = this.prevEdgeQuad.y;
+        edge.quad.x = this.targetQuad.x;
+        edge.quad.y = this.targetQuad.y;
       }
       else
       {
         edge.quad = null;
       }
     }
+  }
+
+  isMoving()
+  {
+    return this.targetMode != null;
   }
 }
 

@@ -58,6 +58,11 @@ class LabelEditor
   {
     return this.target != null;
   }
+
+  isEditting(edge)
+  {
+    return this.target == edge;
+  }
 }
 
 export default LabelEditor;
