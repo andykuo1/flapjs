@@ -1,6 +1,8 @@
 import { Edge } from 'NodalGraph.js';
 import NodalGraphRenderer from 'NodalGraphRenderer.js';
 import NodalGraphSorter from 'NodalGraphSorter.js';
+import MoveController from 'MoveController.js';
+import GraphCursor from 'GraphCursor.js';
 
 class NodalGraphController
 {
@@ -9,6 +11,7 @@ class NodalGraphController
     this.canvas = canvas;
     this.mouse = mouse;
     this.graph = graph;
+
     this.labelEditor = document.getElementById("label-editor");
     this.labelEditorInput = document.getElementById("label-editor-input");
     this.labelEditorInput.addEventListener('keyup', (e) => {
@@ -26,14 +29,13 @@ class NodalGraphController
     })
     this.labelEditorSource = null;
 
+    this.cursor = new GraphCursor(graph, mouse);
+    this.moveController = new MoveController(graph, this.cursor);
+
     this.moveMode = false;
-    this.targetMode = null;
-    this.targetSource = null;
-    this.targetDestination = null;
     this.proxyEdge = new Edge(null, null, "");
 
     this.prevMouse = { x: 0, y: 0 };
-    this.prevEdgeQuad = null;
   }
 
   load()
@@ -78,47 +80,47 @@ class NodalGraphController
   draw(ctx, dt)
   {
     //Get hovered states
-    this.targetDestination = this.getStateByPosition(this.mouse.x, this.mouse.y);
+    this.cursor.targetDestination = this.cursor.getNodeAt(this.mouse.x, this.mouse.y);
 
     //If clicked on state...
-    if (this.targetMode == "state")
+    if (this.cursor.targetMode == "state")
     {
       //Start creating edges if cursor leaves state...
-      if (this.targetSource != this.targetDestination)
+      if (this.cursor.targetSource != this.cursor.targetDestination)
       {
-        this.targetMode = "create-edge";
-        this.proxyEdge.from = this.targetSource;
+        this.cursor.targetMode = "create-edge";
+        this.proxyEdge.from = this.cursor.targetSource;
       }
     }
 
     //If is creating edges and NOT toggling accept state...
-    if (this.targetMode == "create-edge")
+    if (this.cursor.targetMode == "create-edge")
     {
-      this.resolveEdge(this.proxyEdge);
+      this.moveController.resolveEdge(this.proxyEdge);
 
       //Draw the proxy edge
       NodalGraphRenderer.drawEdges(ctx, this.proxyEdge);
     }
 
     //Update the moving target if dragging object...
-    if (this.targetMode && this.targetMode.startsWith("move"))
+    if (this.cursor.targetMode && this.cursor.targetMode.startsWith("move"))
     {
-      this.resolveMove(false);
+      this.moveController.updateMove(this.mouse.x, this.mouse.y);
     }
 
     //Hover information...
     let targetSelect = null;
     let selectMode = null;
 
-    if (targetSelect = this.targetDestination)
+    if (targetSelect = this.cursor.targetDestination)
     {
       selectMode = "state";
     }
-    else if (targetSelect = this.getEdgeByPosition(this.mouse.x, this.mouse.y))
+    else if (targetSelect = this.cursor.getEdgeAt(this.mouse.x, this.mouse.y))
     {
       selectMode = "edge";
     }
-    else if (targetSelect = this.getEdgeEndPointByPosition(this.mouse.x, this.mouse.y))
+    else if (targetSelect = this.cursor.getEdgeByEndPointAt(this.mouse.x, this.mouse.y))
     {
       selectMode = "endpoint";
     }
@@ -174,59 +176,34 @@ class NodalGraphController
   {
     if (this.closeLabelEditor(false))
     {
-      this.targetSource = null;
-      this.targetDestination = null;
-      this.targetMode = "label-edit";
+      this.cursor.targetSource = null;
+      this.cursor.targetDestination = null;
+      this.cursor.targetMode = "label-edit";
       return;
     }
 
     if (this.moveMode)
     {
-      if (this.targetSource = this.getEdgeByPosition(x, y))
-      {
-        this.targetMode = "move-edge";
-      }
-      else if (this.targetSource = this.getStateByPosition(x, y))
-      {
-        this.targetMode = "move-state";
-      }
-      else if (this.targetSource = this.getEdgeEndPointByPosition(x, y))
-      {
-        this.targetMode = "move-endpoint";
-        const quad = this.targetSource.quad;
-        if (quad != null)
-        {
-          this.prevEdgeQuad = { x: quad.x, y: quad.y};
-        }
-        else
-        {
-          this.prevEdgeQuad = null;
-        }
-      }
-      else
-      {
-        this.targetSource = { x: this.mouse.x, y: this.mouse.y };
-        this.targetMode = "move-graph";
-      }
+      this.moveController.beginMove(x, y);
     }
     else
     {
-      if (this.targetSource = this.getEdgeByPosition(x, y))
+      if (this.cursor.targetSource = this.cursor.getEdgeAt(x, y))
       {
-        this.targetMode = "edge";
+        this.cursor.targetMode = "edge";
       }
-      else if (this.targetSource = this.getStateByPosition(x, y))
+      else if (this.cursor.targetSource = this.cursor.getNodeAt(x, y))
       {
-        this.targetMode = "state";
+        this.cursor.targetMode = "state";
       }
-      else if (this.targetSource = this.getEdgeEndPointByPosition(x, y))
+      else if (this.cursor.targetSource = this.cursor.getEdgeByEndPointAt(x, y))
       {
-        this.targetMode = "endpoint";
+        this.cursor.targetMode = "endpoint";
       }
       else
       {
-        this.targetSource = null;
-        this.targetMode = null;
+        this.cursor.targetSource = null;
+        this.cursor.targetMode = null;
       }
     }
   }
@@ -235,24 +212,23 @@ class NodalGraphController
   {
     if (this.moveMode)
     {
-      //Moved something...
-      this.resolveMove(true);
+      this.moveController.endMove(x, y);
     }
     else
     {
-      if (this.targetMode == "state")
+      if (this.cursor.targetMode == "state")
       {
-        this.graph.toggleAcceptState(this.targetSource);
+        this.graph.toggleAcceptState(this.cursor.targetSource);
       }
-      else if (this.targetMode == "edge")
+      else if (this.cursor.targetMode == "edge")
       {
-        this.openLabelEditor(this.targetSource);
+        this.openLabelEditor(this.cursor.targetSource);
       }
-      else if (this.targetMode == "create-edge")
+      else if (this.cursor.targetMode == "create-edge")
       {
-        if (this.targetDestination != null)
+        if (this.cursor.targetDestination != null)
         {
-          const transition = this.createNewTransition(this.targetSource, this.targetDestination);
+          const transition = this.createNewTransition(this.cursor.targetSource, this.cursor.targetDestination);
           if (this.proxyEdge.quad != null)
           {
             transition.x = this.proxyEdge.x;
@@ -261,12 +237,12 @@ class NodalGraphController
           this.openLabelEditor(transition);
         }
       }
-      else if (this.targetMode == "endpoint")
+      else if (this.cursor.targetMode == "endpoint")
       {
         //Left click endpoint?
       }
       //If did not click on anything...
-      else if (this.targetMode == null && this.targetSource == null)
+      else if (this.cursor.targetMode == null && this.cursor.targetSource == null)
       {
         //If click, create node at mouse position...
         const dx = x - this.prevMouse.x;
@@ -280,78 +256,8 @@ class NodalGraphController
       }
     }
 
-    this.targetSource = null;
-    this.targetMode = null;
-  }
-
-  resolveEdge(edge)
-  {
-    edge.to = this.targetDestination || this.mouse;
-
-    //If the cursor returns to the state after leaving it...
-    if (edge.isSelfLoop())
-    {
-      //Make it a self loop
-      const dx = edge.from.x - this.mouse.x;
-      const dy = edge.from.y - this.mouse.y;
-      const angle = Math.atan2(dy, dx);
-      edge.x = edge.from.x - Math.cos(angle) * SELF_LOOP_HEIGHT;
-      edge.y = edge.from.y - Math.sin(angle) * SELF_LOOP_HEIGHT;
-    }
-    else
-    {
-      if (this.prevEdgeQuad != null)
-      {
-        if (edge.quad == null) edge.quad = { x: 0, y: 0 };
-        edge.quad.x = this.prevEdgeQuad.x;
-        edge.quad.y = this.prevEdgeQuad.y;
-      }
-      else
-      {
-        edge.quad = null;
-      }
-    }
-  }
-
-  resolveMove(final)
-  {
-    if (this.targetSource == null) return;
-
-    //Readjust render position for graph offset
-    if (this.targetMode == "move-edge")
-    {
-      this.targetSource.x = this.mouse.x;
-      this.targetSource.y = this.mouse.y;
-    }
-    else if (this.targetMode == "move-endpoint")
-    {
-      this.resolveEdge(this.targetSource);
-
-      if (this.targetDestination == null)
-      {
-        if (final)
-        {
-          //Delete it...
-          this.graph.destroyEdge(this.targetSource);
-        }
-      }
-
-      if (final)
-      {
-        this.prevEdgeQuad = null;
-      }
-    }
-    else if (this.targetMode == "move-state")
-    {
-      this.targetSource.x = this.mouse.x - this.graph.centerX;
-      this.targetSource.y = this.mouse.y - this.graph.centerY;
-    }
-    else if (this.targetMode == "move-graph")
-    {
-      //Move the graph if draggin empty...
-      this.graph.offsetX = this.mouse.x - this.targetSource.x;
-      this.graph.offsetY = this.mouse.y - this.targetSource.y;
-    }
+    this.cursor.targetSource = null;
+    this.cursor.targetMode = null;
   }
 
   openLabelEditor(source)
@@ -385,52 +291,6 @@ class NodalGraphController
       return true;
     }
     return false;
-  }
-
-  getStateByPosition(x, y)
-  {
-    for(const node of this.graph.nodes)
-    {
-      const dx = x - node.x;
-      const dy = y - node.y;
-      if (dx * dx + dy * dy < NODE_RADIUS_SQU)
-      {
-        return node;
-      }
-    }
-
-    return null;
-  }
-
-  getEdgeByPosition(x, y)
-  {
-    for(const edge of this.graph.edges)
-    {
-      const dx = x - edge.x;
-      const dy = y - edge.y;
-      if (dx * dx + dy * dy < EDGE_RADIUS_SQU)
-      {
-        return edge;
-      }
-    }
-
-    return null;
-  }
-
-  getEdgeEndPointByPosition(x, y)
-  {
-    for(const edge of this.graph.edges)
-    {
-      const point = edge.getEndPoint();
-      const dx = x - point[0];
-      const dy = y - point[1];
-      if (dx * dx + dy * dy < ENDPOINT_RADIUS_SQU)
-      {
-        return edge;
-      }
-    }
-
-    return null;
   }
 }
 
