@@ -22,14 +22,14 @@ class LabelEditor
     this.target = null;
   }
 
-  open(edge)
+  open(edge, placeholder=null)
   {
     if (this.target != edge)
     {
       this.target = edge;
       this.element.style.left = (this.target.x - this.element.offsetWidth / 2) + 'px';
       this.element.style.top = (this.target.y - this.element.offsetHeight / 2) + 'px';
-      this.inputElement.value = this.target.label;
+      this.inputElement.value = placeholder || this.target.label;
 
       this.element.style.visibility = "visible";
       this.inputElement.focus();

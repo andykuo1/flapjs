@@ -10,14 +10,17 @@ class EditController
     this.labelEditor = labelEditor;
     this.moveController = moveController;
 
-    this.proxyEdge = new Edge(null, null, "");
+    this.target = null;
+    this.targetMode = null;
+    this.targetEdge = null;
+    
     this.prevMouse = { x: 0, y: 0 };
   }
 
   createNewState(x, y)
   {
     const node = this.graph.createNewNode();
-    node.label = "q" + (this.graph.nodes.length - 1);
+    node.label = STR_STATE_LABEL + (this.graph.nodes.length - 1);
     node.x = x || (Math.random() * SPAWN_RADIUS * 2) - SPAWN_RADIUS;
     node.y = y || (Math.random() * SPAWN_RADIUS * 2) - SPAWN_RADIUS;
     return node;
@@ -26,28 +29,28 @@ class EditController
   createNewTransition(src, dst)
   {
     const edge = this.graph.createNewEdge(src, dst);
-    edge.label = "0";
+    edge.label = STR_TRANSITION_DEFAULT_LABEL;
     return edge;
   }
 
   beginEdit(x, y)
   {
-    if (this.cursor.targetSource = this.cursor.getEdgeAt(x, y))
+    if (this.target = this.cursor.getEdgeAt(x, y))
     {
-      this.cursor.targetMode = "edge";
+      this.targetMode = "edge";
     }
-    else if (this.cursor.targetSource = this.cursor.getNodeAt(x, y))
+    else if (this.target = this.cursor.getNodeAt(x, y))
     {
-      this.cursor.targetMode = "state";
+      this.targetMode = "state";
     }
-    else if (this.cursor.targetSource = this.cursor.getEdgeByEndPointAt(x, y))
+    else if (this.target = this.cursor.getEdgeByEndPointAt(x, y))
     {
-      this.cursor.targetMode = "endpoint";
+      this.targetMode = "endpoint";
     }
     else
     {
-      this.cursor.targetSource = null;
-      this.cursor.targetMode = null;
+      this.target = null;
+      this.targetMode = null;
     }
 
     this.prevMouse.x = x;
@@ -57,55 +60,45 @@ class EditController
   updateEdit(ctx, x, y)
   {
     //If clicked on state...
-    if (this.cursor.targetMode == "state")
+    if (this.targetMode == "state")
     {
       //Start creating edges if cursor leaves state...
-      if (this.cursor.targetSource != this.cursor.targetDestination)
+      if (this.target != this.cursor.targetDestination)
       {
-        this.cursor.targetMode = "create-edge";
-        this.proxyEdge.from = this.cursor.targetSource;
+        this.targetMode = "create-edge";
+        this.targetEdge = this.graph.createNewEdge(this.target, null);
+        this.targetEdge.label = STR_TRANSITION_PROXY_LABEL;
+
+        this.moveController.moveEndPoint(this.targetEdge);
       }
-    }
-
-    //If is creating edges and NOT toggling accept state...
-    if (this.cursor.targetMode == "create-edge")
-    {
-      this.moveController.resolveEdge(x, y, this.proxyEdge);
-
-      //Draw the proxy edge
-      NodalGraphRenderer.drawEdges(ctx, this.proxyEdge);
     }
   }
 
   endEdit(x, y)
   {
-    if (this.cursor.targetMode == "state")
+    if (this.targetMode == "state")
     {
-      this.graph.toggleAcceptState(this.cursor.targetSource);
+      this.graph.toggleAcceptState(this.target);
     }
-    else if (this.cursor.targetMode == "edge")
+    else if (this.targetMode == "edge")
     {
-      this.labelEditor.open(this.cursor.targetSource);
+      this.labelEditor.open(this.target);
     }
-    else if (this.cursor.targetMode == "create-edge")
+    else if (this.targetMode == "create-edge")
     {
-      if (this.cursor.targetDestination != null)
+      if (this.moveController.endMove(x, y))
       {
-        const transition = this.createNewTransition(this.cursor.targetSource, this.cursor.targetDestination);
-        if (this.proxyEdge.quad != null)
-        {
-          transition.x = this.proxyEdge.x;
-          transition.y = this.proxyEdge.y;
-        }
-        this.labelEditor.open(transition);
+        this.labelEditor.open(this.targetEdge, STR_TRANSITION_DEFAULT_LABEL);
       }
+
+      this.targetEdge = null;
     }
-    else if (this.cursor.targetMode == "endpoint")
+    else if (this.targetMode == "endpoint")
     {
       //Left click endpoint?
     }
     //If did not click on anything...
-    else if (this.cursor.targetMode == null && this.cursor.targetSource == null)
+    else if (this.targetMode == null && this.target == null)
     {
       //If click, create node at mouse position...
       const dx = x - this.prevMouse.x;
@@ -117,6 +110,9 @@ class EditController
         this.createNewState(x - this.graph.centerX, y - this.graph.centerY);
       }
     }
+
+    this.target = null;
+    this.targetMode = null;
   }
 }
 

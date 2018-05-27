@@ -2,6 +2,10 @@
 const SUBMIT_KEY = 13; //ENTER
 const CLEAR_KEY = 27; //ESCAPE
 
+const STR_TRANSITION_DEFAULT_LABEL = "0";
+const STR_TRANSITION_PROXY_LABEL = "#";
+const STR_STATE_LABEL = "q";
+
 //Math
 const PI2 = Math.PI * 2;
 const HALF_PI = Math.PI / 2.0;

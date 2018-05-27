@@ -34,7 +34,6 @@ class NodalGraphController
       this.markTarget(mouse.x, mouse.y);
     });
     this.mouse.on('mouseup', (mouse, button) => {
-      this.moveMode = (button == 3);
       this.releaseTarget(mouse.x, mouse.y);
     });
 
@@ -86,10 +85,6 @@ class NodalGraphController
   {
     if (this.labelEditor.isOpen())
     {
-      this.labelEditor.close(false);
-      this.cursor.targetSource = null;
-      this.cursor.targetDestination = null;
-      this.cursor.targetMode = "label-edit";
       return;
     }
 
@@ -106,6 +101,12 @@ class NodalGraphController
 
   releaseTarget(x, y)
   {
+    if (this.labelEditor.isOpen())
+    {
+      this.labelEditor.close(false);
+      return;
+    }
+
     if (this.moveMode)
     {
       this.moveController.endMove(x, y);
@@ -114,9 +115,6 @@ class NodalGraphController
     {
       this.editController.endEdit(x, y);
     }
-
-    this.cursor.targetSource = null;
-    this.cursor.targetMode = null;
   }
 }
 

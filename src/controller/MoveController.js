@@ -56,24 +56,30 @@ class MoveController
     if (target = this.cursor.getNodeAt(x, y))
     {
       this.moveNode(target);
+      return true;
     }
     else if (target = this.cursor.getEdgeAt(x, y))
     {
       this.moveEdge(target);
+      return true;
     }
     else if (target = this.cursor.getEdgeByEndPointAt(x, y))
     {
       this.moveEndPoint(target);
+      return true;
     }
     else
     {
       this.moveGraph(x, y);
+      return true;
     }
+
+    return false;
   }
 
   updateMove(x, y)
   {
-    if (this.targetMode == null) return;
+    if (this.targetMode == null) return false;
 
     //Readjust render position for graph offset
     if (this.targetMode == "edge")
@@ -111,6 +117,8 @@ class MoveController
       this.graph.offsetX = x - this.targetGraphX;
       this.graph.offsetY = y - this.targetGraphY;
     }
+
+    return true;
   }
 
   endMove(x, y)
@@ -130,6 +138,7 @@ class MoveController
       {
         //Delete it...
         this.graph.destroyEdge(this.target);
+        return false;
       }
 
       this.targetQuad = null;
@@ -139,6 +148,8 @@ class MoveController
 
     this.target = null;
     this.targetMode = null;
+
+    return true;
   }
 
   resolveEdge(x, y, edge)
