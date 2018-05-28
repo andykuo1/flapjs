@@ -123,7 +123,7 @@ class MoveController
 
   endMove(x, y)
   {
-    if (this.targetMode == null) return;
+    if (this.targetMode == null) return false;
 
     this.updateMove(x, y);
 
@@ -182,6 +182,11 @@ class MoveController
   }
 
   isMoving()
+  {
+    return this.targetMode != null;
+  }
+
+  isActive()
   {
     return this.targetMode != null;
   }

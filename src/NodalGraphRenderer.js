@@ -9,6 +9,7 @@ class NodalGraphRenderer
 
   render(ctx, dt, graph)
   {
+    ctx.save();
     this.drawNodes(ctx, graph.nodes);
 
     //Draw initial node
@@ -27,6 +28,7 @@ class NodalGraphRenderer
 
     //Update hover angles
     this.hoverAngle = (this.hoverAngle + HOVER_ANGLE_SPEED) % PI2;
+    ctx.restore();
   }
 
   drawNodes(ctx, nodes)

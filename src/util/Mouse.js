@@ -6,6 +6,8 @@ const PREVENT_CONTEXT_MENU = true;
 //EVENT: mousedown(mouse, button)
 //EVENT: mouseclick(mouse, button)
 //EVENT: mousewheel(mouse, dx, dy)
+//EVENT: mouseenter(mouse)
+//EVENT: mouseexit(mouse)
 
 class Mouse
 {
@@ -29,8 +31,10 @@ class Mouse
     this._mouseup = this.onMouseUp.bind(this);
     this._mousedown = this.onMouseDown.bind(this);
     this._mouseclick = this.onMouseClick.bind(this);
-    this._mousemove = this.onMouseMove.bind(this);
     this._wheel = this.onMouseWheel.bind(this);
+    this._mousemove = this.onMouseMove.bind(this);
+    this._mouseenter = this.onMouseEnter.bind(this);
+    this._mouseexit = this.onMouseExit.bind(this);
     this._touchstart = this.onTouchStart.bind(this);
 
     this._touchmove = this.onTouchMove.bind(this);
@@ -49,8 +53,10 @@ class Mouse
     this._element.addEventListener('mouseup', this._mouseup);
     this._element.addEventListener('mousedown', this._mousedown);
     this._element.addEventListener('click', this._mouseclick);
-    this._element.addEventListener('mousemove', this._mousemove);
     this._element.addEventListener('wheel', this._wheel);
+    this._element.addEventListener('mousemove', this._mousemove);
+    this._element.addEventListener('mouseenter', this._mouseenter);
+    this._element.addEventListener('mouseleave', this._mouseexit);
     this._element.addEventListener('touchstart', this._touchstart);
   }
 
@@ -60,8 +66,10 @@ class Mouse
     this._element.removeEventListener('mouseup', this._mouseup);
     this._element.removeEventListener('mousedown', this._mousedown);
     this._element.removeEventListener('click', this._mouseclick);
-    this._element.removeEventListener('mousemove', this._mousemove);
     this._element.removeEventListener('wheel', this._wheel);
+    this._element.removeEventListener('mousemove', this._mousemove);
+    this._element.removeEventListener('mouseenter', this._mouseenter);
+    this._element.removeEventListener('mouseleave', this._mouseexit);
     this._element.removeEventListener('touchstart', this._touchstart);
   }
 
@@ -95,6 +103,16 @@ class Mouse
     const screen = this._canvas.getBoundingClientRect();
     this.x = event.clientX - screen.left;
     this.y = event.clientY - screen.top;
+  }
+
+  onMouseEnter(event)
+  {
+    this.emit('mouseenter', this);
+  }
+
+  onMouseExit(event)
+  {
+    this.emit('mouseexit', this);
   }
 
   onTouchStart(event)

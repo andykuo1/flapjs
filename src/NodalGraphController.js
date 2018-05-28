@@ -6,6 +6,7 @@ import LabelEditor from 'controller/LabelEditor.js';
 import MoveController from 'controller/MoveController.js';
 import EditController from 'controller/EditController.js';
 import HoverController from 'controller/HoverController.js';
+import SelectionController from 'controller/SelectionController.js';
 
 class NodalGraphController
 {
@@ -18,8 +19,9 @@ class NodalGraphController
     this.cursor = new GraphCursor(graph, mouse);
     this.labelEditor = new LabelEditor();
 
+    this.selectionController = new SelectionController(graph);
     this.moveController = new MoveController(graph, this.cursor);
-    this.editController = new EditController(graph, this.cursor, this.labelEditor, this.moveController);
+    this.editController = new EditController(graph, this.cursor, this.labelEditor, this.moveController, this.selectionController);
     this.hoverController = new HoverController(graph, this.cursor);
 
     this.moveMode = false;
@@ -32,6 +34,9 @@ class NodalGraphController
       this.markTarget(mouse.x, mouse.y);
     });
     this.mouse.on('mouseup', (mouse, button) => {
+      this.releaseTarget(mouse.x, mouse.y);
+    });
+    this.mouse.on('mouseexit', (mouse) => {
       this.releaseTarget(mouse.x, mouse.y);
     });
 
@@ -68,6 +73,10 @@ class NodalGraphController
     this.cursor.targetDestination = this.cursor.getNodeAt(mx, my);
 
     this.editController.updateEdit(ctx, mx, my);
+    if (this.selectionController.hasSelection())
+    {
+      this.selectionController.drawSelection(ctx);
+    }
 
     //Update the moving target if dragging object...
     if (this.moveController.isMoving())
@@ -75,8 +84,15 @@ class NodalGraphController
       this.moveController.updateMove(mx, my);
     }
 
-    //Draw hover
-    this.hoverController.draw(ctx);
+    //Draw hover if not selecting...
+    if (!this.selectionController.isSelecting())
+    {
+      this.hoverController.draw(ctx);
+    }
+    else
+    {
+      this.selectionController.updateSelection(ctx, mx, my);
+    }
   }
 
   markTarget(x, y)
@@ -89,6 +105,12 @@ class NodalGraphController
     }
     else
     {
+      //Can only move (not other actions) for selected targets...
+      if (this.selectionController.hasSelection())
+      {
+        this.selectionController.clearSelection();
+      }
+
       this.editController.beginEdit(x, y);
     }
   }
@@ -109,6 +131,7 @@ class NodalGraphController
     {
       this.editController.endEdit(x, y);
     }
+    this.selectionController.endSelection(x, y);
   }
 }
 

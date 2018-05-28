@@ -1,15 +1,18 @@
 import NodalGraphRenderer from 'NodalGraphRenderer.js';
-import SelectionController from 'controller/SelectionController.js';
 
 class EditController
 {
-  constructor(graph, cursor, labelEditor, moveController)
+  constructor(graph, cursor, labelEditor, moveController, selectionController)
   {
     this.graph = graph;
     this.cursor = cursor;
     this.labelEditor = labelEditor;
     this.moveController = moveController;
-    this.selectionController = new SelectionController(graph);
+    this.selectionController = selectionController;
+
+    this.doubleTapTicks = 0;
+    this.tapX = 0;
+    this.tapY = 0;
 
     this.target = null;
     this.targetMode = null;
@@ -37,26 +40,39 @@ class EditController
     if (this.target = this.cursor.getEdgeAt(x, y))
     {
       this.targetMode = "edge";
+      return true;
     }
     else if (this.target = this.cursor.getNodeAt(x, y))
     {
       this.targetMode = "state";
+      return true;
     }
     else if (this.target = this.cursor.getEdgeByEndPointAt(x, y))
     {
       this.targetMode = "endpoint";
+      return true;
     }
     else
     {
       this.target = null;
-      this.targetMode = "selection";
+      this.targetMode = this.doubleTapTicks > 0 ? "doubleTap" : "singleTap";
 
-      this.selectionController.beginSelection(x, y);
+      this.tapX = x;
+      this.tapY = y;
     }
+
+    return false;
   }
 
   updateEdit(ctx, x, y)
   {
+    //If waiting for second tap...
+    if (this.targetMode == null)
+    {
+      if (this.doubleTapTicks > 0) --this.doubleTapTicks;
+      return false;
+    }
+
     //If clicked on state...
     if (this.targetMode == "state")
     {
@@ -70,14 +86,39 @@ class EditController
         this.moveController.moveEndPoint(this.targetEdge);
       }
     }
-    else if (this.targetMode == "selection")
+    else if (this.targetMode == "singleTap")
     {
-      this.selectionController.updateSelection(ctx, x, y);
+      console.log("UPDATING?");
+      const dx = this.tapX - x;
+      const dy = this.tapY - y;
+      //Is dragging on single tap...
+      if (dx * dx + dy * dy > CURSOR_RADIUS_SQU)
+      {
+        this.selectionController.beginSelection(x, y);
+        this.targetMode = null;
+        return false;
+      }
     }
+    else if (this.targetMode == "doubleTap")
+    {
+      const dx = this.tapX - x;
+      const dy = this.tapY - y;
+      //Is dragging on double tap...
+      if (dx * dx + dy * dy > CURSOR_RADIUS_SQU)
+      {
+        this.selectionController.beginSelection(x, y);
+        this.targetMode = null;
+        return false;
+      }
+    }
+
+    return true;
   }
 
   endEdit(x, y)
   {
+    if (this.targetMode == null) return false;
+
     if (this.targetMode == "state")
     {
       this.graph.toggleAcceptState(this.target);
@@ -98,14 +139,31 @@ class EditController
     else if (this.targetMode == "endpoint")
     {
       //Left click endpoint?
+      this.target = null;
+      this.targetMode = null;
+      return false;
     }
-    else if (this.targetMode == "selection")
+    else if (this.targetMode == "singleTap")
     {
-      this.selectionController.endSelection(x, y);
+      this.doubleTapTicks = DOUBLE_TAP_TICKS;
+      this.target = null;
+      this.targetMode = null;
+      return false;
+    }
+    else if (this.targetMode == "doubleTap")
+    {
+      this.createNewState(x - this.graph.centerX, y - this.graph.centerY);
+      this.doubleTapTicks = 0;
     }
 
     this.target = null;
     this.targetMode = null;
+    return true;
+  }
+
+  isActive()
+  {
+    return this.targetMode != null;
   }
 }
 
