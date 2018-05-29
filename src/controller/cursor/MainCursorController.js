@@ -433,6 +433,11 @@ class MainCursorController
     this.moveCursor.moveTarget(this.cursor, this.target, this.targetType, this.mouse.x, this.mouse.y);
   }
 
+  stopMove()
+  {
+    this.moveMode = false;
+  }
+
   isWithinTrash(x, y)
   {
     const dx = x - this.trashArea.x;

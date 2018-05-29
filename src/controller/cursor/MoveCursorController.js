@@ -16,9 +16,24 @@ class MoveCursorConstroller extends CursorController
   {
     if (target != null)
     {
-      this.prevTarget.x = x;
-      this.prevTarget.y = y;
-      this.mainController.startMove(target, targetType);
+      //Makes sure that placeholders are not quadratics!
+      if (targetType == "edge")
+      {
+        console.log(target.isPlaceholder() + ", " + targetType);
+      }
+
+      if (targetType == "edge" && target.isPlaceholder())
+      {
+        this.mainController.stopMove();
+        return false;
+      }
+      //Otherwise...
+      else
+      {
+        this.prevTarget.x = x;
+        this.prevTarget.y = y;
+        this.mainController.startMove(target, targetType);
+      }
     }
     else
     {
