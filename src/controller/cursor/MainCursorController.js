@@ -1,9 +1,10 @@
 import LabelEditor from 'controller/LabelEditor.js';
 import GraphCursor from 'controller/GraphCursor.js';
+import NodalGraphRenderer from 'NodalGraphRenderer.js';
 
 import EditCursorController from 'controller/cursor/EditCursorController.js';
 import MoveCursorController from 'controller/cursor/MoveCursorController.js';
-import HoverCursorController from 'controller/cursor/HoverCursorController.js';
+import SelectCursorController from 'controller/cursor/SelectCursorController.js';
 
 
 /*
@@ -70,7 +71,7 @@ class MainCursorController
 
     this.editCursor = new EditCursorController(this, this.graph);
     this.moveCursor = new MoveCursorController(this, this.graph);
-    this.hoverCursor = new HoverCursorController(this);
+    this.selectCursor = new SelectCursorController(this, this.graph);
 
     this.moveMode = false;
 
@@ -104,9 +105,69 @@ class MainCursorController
     const mx = this.mouse.x;
     const my = this.mouse.y;
 
-    this.editCursor.draw(ctx);
+    this.selectCursor.draw(ctx);
 
-    this.hoverCursor.drawHoverInformation(ctx, this.cursor, mx, my);
+    this.drawHoverInformation(ctx, mx, my);
+  }
+
+  drawHoverInformation(ctx, x, y)
+  {
+    let selectTarget = null;
+    let selectType = null;
+
+    if (selectTarget = this.target)
+    {
+      selectTarget = this.target;
+      selectType = this.targetType;
+    }
+    else if (selectTarget = this.cursor.getNodeAt(x, y))
+    {
+      selectType = "node";
+    }
+    else if (selectTarget = this.cursor.getEdgeAt(x, y))
+    {
+      selectType = "edge";
+    }
+    else if (selectTarget = this.cursor.getEdgeByEndPointAt(x, y))
+    {
+      selectType = "endpoint";
+    }
+
+    if (selectTarget != null)
+    {
+      //Don't draw hover info for already selected targets...
+      if (this.selectCursor.selectBox.targets.includes(selectTarget))
+      {
+        return;
+      }
+
+      let x = 0;
+      let y = 0;
+      let r = CURSOR_RADIUS;
+      switch(selectType)
+      {
+        case "node":
+          x = selectTarget.x;
+          y = selectTarget.y;
+          r = NODE_RADIUS;
+          break;
+        case "edge":
+          x = selectTarget.x;
+          y = selectTarget.y;
+          r = EDGE_RADIUS;
+          break;
+        case "endpoint":
+          const endpoint = selectTarget.getEndPoint();
+          x = endpoint[0];
+          y = endpoint[1];
+          r = ENDPOINT_RADIUS;
+          break;
+        default:
+          x = x;
+          y = y;
+      }
+      NodalGraphRenderer.drawHoverCircle(ctx, x, y, r + HOVER_RADIUS_OFFSET);
+    }
   }
 
   onMouseDown(mouse, button)
@@ -136,13 +197,13 @@ class MainCursorController
       this.targetType = null;
     }
 
-    //TODO: should be in editCursor, but there is not onMouseDown event...
-    if (this.editCursor.hasSelection())
+    //TODO: should be in selectCursor, but there is not onMouseDown event...
+    if (this.selectCursor.hasSelection())
     {
       //Unselect everything is clicked on something other than nodes...
-      if (this.targetType != "node" || !this.editCursor.selectBox.targets.includes(this.target))
+      if (this.targetType != "node" || !this.selectCursor.selectBox.targets.includes(this.target))
       {
-        this.editCursor.clearSelection();
+        this.selectCursor.clearSelection();
       }
     }
   }
@@ -246,7 +307,8 @@ class MainCursorController
     }
     else
     {
-      return this.editCursor.onSingleTap(this.cursor, x, y, this.target, this.targetType);
+      return this.editCursor.onSingleTap(this.cursor, x, y, this.target, this.targetType) ||
+              this.selectCursor.onSingleTap(this.cursor, x, y, this.target, this.targetType);
     }
   }
 
@@ -258,7 +320,8 @@ class MainCursorController
     }
     else
     {
-      return this.editCursor.onDoubleTap(this.cursor, x, y, this.target, this.targetType);
+      return this.editCursor.onDoubleTap(this.cursor, x, y, this.target, this.targetType) ||
+              this.selectCursor.onDoubleTap(this.cursor, x, y, this.target, this.targetType);
     }
   }
 
@@ -270,7 +333,8 @@ class MainCursorController
     }
     else
     {
-      return this.editCursor.onStartDragging(this.cursor, x, y, this.target, this.targetType);
+      return this.editCursor.onStartDragging(this.cursor, x, y, this.target, this.targetType) ||
+              this.selectCursor.onStartDragging(this.cursor, x, y, this.target, this.targetType);
     }
   }
 
@@ -282,7 +346,8 @@ class MainCursorController
     }
     else
     {
-      return this.editCursor.onDragging(this.cursor, x, y, this.target, this.targetType);
+      return this.editCursor.onDragging(this.cursor, x, y, this.target, this.targetType) ||
+              this.selectCursor.onDragging(this.cursor, x, y, this.target, this.targetType);
     }
   }
 
@@ -294,7 +359,8 @@ class MainCursorController
     }
     else
     {
-      return this.editCursor.onStopDragging(this.cursor, x, y, this.target, this.targetType);
+      return this.editCursor.onStopDragging(this.cursor, x, y, this.target, this.targetType) ||
+              this.selectCursor.onStopDragging(this.cursor, x, y, this.target, this.targetType);
     }
   }
 
