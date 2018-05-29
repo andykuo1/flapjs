@@ -57,7 +57,7 @@ export class NodalGraph
       else if (edge.to == node)
       {
         //Return any edges that have this node as a destination
-        //TODO: Implement return edges
+        edge.makePlaceholder();
       }
     }
     this.nodes.splice(this.nodes.indexOf(node), 1);
@@ -99,7 +99,7 @@ export class NodalGraph
     this._offsetX = lerp(this._offsetX, this.nextOffsetX, dt);
     this._offsetY = lerp(this._offsetY, this.nextOffsetY, dt);
 
-    for(let node of this.nodes)
+    for(const node of this.nodes)
     {
       node.update(dt);
     }
@@ -222,20 +222,25 @@ export class Edge
   */
   getEndPoint()
   {
+    //Get end point for straight edges...
     if (this.quad == null)
     {
+      const radius = this.isPlaceholder() ? 1 : NODE_RADIUS;
       const dx = this.from.x - this.to.x;
       const dy = this.from.y - this.to.y;
       const angle = -Math.atan2(dy, dx) - HALF_PI;
-      const xx = NODE_RADIUS * Math.sin(angle);
-      const yy = NODE_RADIUS * Math.cos(angle);
+      const xx = radius * Math.sin(angle);
+      const yy = radius * Math.cos(angle);
 
       const endX = this.to.x - xx;
       const endY = this.to.y - yy;
       return [endX, endY];
     }
+    //Get end point for quadratics...
     else
     {
+      //Placeholder edges are should always be straight...
+      //const radius = this.isPlaceholder() ? 1 : NODE_RADIUS;
       const midpoint = this.getMidPoint();
       const quadX = midpoint[0] + (this.quad.x * 2);
       const quadY = midpoint[1] + (this.quad.y * 2);
@@ -286,6 +291,21 @@ export class Edge
     this.quad.y = value - this.centerY;
     if (Math.abs(this.quad.y) < 8) this.quad.y = 0;
     if (this.quad.x == 0 && this.quad.y == 0) this.quad = null;
+  }
+
+  makePlaceholder()
+  {
+    if (!this.to) this.to = { x: this.from.x + 1, y: this.from.y };
+    const dx = this.from.x - this.to.x;
+    const dy = this.from.y - this.to.y;
+    const angle = -Math.atan2(dx, dy) - HALF_PI;
+    this.to = {
+      from: this.from,
+      dx: Math.cos(angle),
+      dy: Math.sin(angle),
+      get x() { return this.from.x + PLACEHOLDER_LENGTH * this.dx; },
+      get y() { return this.from.y + PLACEHOLDER_LENGTH * this.dy; }
+    };
   }
 
   isSelfLoop()

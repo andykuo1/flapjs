@@ -82,7 +82,7 @@ class MainCursorController
 
     this.target = null;
     this.targetType = null;
-
+    
     this.shouldDestroyPointlessEdges = false;
   }
 
@@ -416,6 +416,7 @@ class MainCursorController
 
   isWithinTrash(x, y)
   {
+    //TODO: implement trash area
     return false;
   }
 }

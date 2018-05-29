@@ -7,6 +7,7 @@ class MoveCursorConstroller extends CursorController
     super(graph);
 
     this.mainController = mainController;
+    this.prevTarget = { x: 0, y: 0 };
     this.graphTarget = { x: 0, y: 0 };
     this.quadTarget = { x: 0, y: 0 };
   }
@@ -15,6 +16,8 @@ class MoveCursorConstroller extends CursorController
   {
     if (target != null)
     {
+      this.prevTarget.x = x;
+      this.prevTarget.y = y;
       this.mainController.startMove(target, targetType);
     }
     else
@@ -56,14 +59,7 @@ class MoveCursorConstroller extends CursorController
           //Keep edges as placeholders (used in DFA's)
           else
           {
-            //TODO: should actually save the edge as a placeholder...
-            this.graph.destroyEdge(target);
-            /*
-            const dx = target.from.x - x;
-            const dy = target.from.y - y;
-            const angle = Math.atan2(dy, dx) - Math.PI;
-            target.to = { x: PLACEHOLDER_LENGTH * Math.cos(angle), y: PLACEHOLDER_LENGTH * Math.sin(angle) };
-            target.quad = null;
+            target.makePlaceholder();
 
             //Open label editor if default edge...
             if (target.label == STR_TRANSITION_PROXY_LABEL)
@@ -71,7 +67,6 @@ class MoveCursorConstroller extends CursorController
               target.label = STR_TRANSITION_DEFAULT_LABEL;
               this.mainController.openLabelEditor(target);
             }
-            */
           }
         }
         else
@@ -85,6 +80,29 @@ class MoveCursorConstroller extends CursorController
         }
 
         return true;
+      }
+      else if (targetType == "node")
+      {
+        //Delete it if withing trash area...
+        if (this.mainController.isWithinTrash(x, y))
+        {
+          //If there exists selected states, delete them all!
+          if (this.mainController.selectCursor.hasSelection())
+          {
+            for(const select of this.mainController.selectCursor.getSelection())
+            {
+              this.graph.destroyNode(select);
+            }
+            this.mainController.selectCursor.clearSelection();
+          }
+          //Delete a single node
+          else
+          {
+            this.graph.destroyNode(target);
+          }
+
+          return true;
+        }
       }
     }
     else
@@ -104,12 +122,20 @@ class MoveCursorConstroller extends CursorController
 
     if (targetType == "node")
     {
-      //TODO: If cursor.hasSelectedStates : move them all!!!
-      //Otherwise:
-      if (this.mainController.isWithinTrash(0, 0))
+      //If there exists selected states, move them all!
+      if (this.mainController.selectCursor.hasSelection())
       {
-        this.graph.destroyNode(target);
+        const dx = x - this.prevTarget.x;
+        const dy = y - this.prevTarget.y;
+        for(const select of this.mainController.selectCursor.getSelection())
+        {
+          select.nextX += dx;
+          select.nextY += dy;
+        }
+        this.prevTarget.x = x;
+        this.prevTarget.y = y;
       }
+      //Move a single node
       else
       {
         target.x = x - this.graph.centerX;
