@@ -103,6 +103,7 @@ class Mouse
     const screen = this._canvas.getBoundingClientRect();
     this.x = event.clientX - screen.left;
     this.y = event.clientY - screen.top;
+    this.emit('mousemove', this, this.x, this.y);
   }
 
   onMouseEnter(event)

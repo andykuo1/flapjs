@@ -64,7 +64,12 @@ class NodalGraphController
     });
   }
 
-  draw(ctx, dt)
+  update(dt)
+  {
+
+  }
+
+  draw(ctx)
   {
     const mx = this.mouse.x;
     const my = this.mouse.y;

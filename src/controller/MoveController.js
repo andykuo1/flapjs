@@ -185,11 +185,6 @@ class MoveController
   {
     return this.targetMode != null;
   }
-
-  isActive()
-  {
-    return this.targetMode != null;
-  }
 }
 
 export default MoveController;

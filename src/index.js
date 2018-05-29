@@ -27,10 +27,13 @@ import NodalGraphController from 'NodalGraphController.js';
 import NodalGraphRenderer from 'NodalGraphRenderer.js';
 import NodalGraphSorter from 'NodalGraphSorter.js';
 import NodalGraphExporter from 'NodalGraphExporter.js';
+
+import MainController from 'controller/cursor/MainController.js';
+
 import { NodalGraph } from 'NodalGraph.js';
 
 const graph = new NodalGraph(canvas);
-const controller = new NodalGraphController(canvas, mouse, graph);
+const controller = new MainController(graph, mouse); //new NodalGraphController(canvas, mouse, graph);
 const exporter = new NodalGraphExporter(graph);
 
 function onCanvasLoad()
@@ -59,8 +62,9 @@ function onCanvasDraw(ctx, time)
 {
   const dt = (time - prevTime) / avgFramesPerSecond;
   graph.update(dt);
+  controller.update(dt);
   NodalGraphSorter.update(dt, graph);
   NodalGraphRenderer.render(ctx, dt, graph);
-  controller.draw(ctx, dt);
+  controller.draw(ctx);
   prevTime = time;
 }

@@ -88,7 +88,6 @@ class EditController
     }
     else if (this.targetMode == "singleTap")
     {
-      console.log("UPDATING?");
       const dx = this.tapX - x;
       const dy = this.tapY - y;
       //Is dragging on single tap...
@@ -161,7 +160,7 @@ class EditController
     return true;
   }
 
-  isActive()
+  isEditing()
   {
     return this.targetMode != null;
   }
