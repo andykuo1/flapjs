@@ -10,6 +10,7 @@ To make a program that is more accessible and intuitive to use, so we can become
 * [Features](#features)
 * [Setting up the workspace](#setting-up-the-workspace)
 * [Running the program](#running-the-program)
+* [Design notes](#design-notes)
 
 ---
 
@@ -132,6 +133,6 @@ This will run all appropriate commands to bundle and build the program, then wil
 
 ---
 
-## Notes
-
+## Design notes
+Should dragging be allowed to exit and re-enter the canvas? Or should everything be cancelled on exit?
 3v - 6 >= e

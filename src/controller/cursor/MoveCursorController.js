@@ -48,10 +48,35 @@ class MoveCursorConstroller extends CursorController
       {
         if (!result)
         {
-          this.graph.destroyEdge(target);
+          //Destroy any edge that no longer have a destination
+          if (this.mainController.shouldDestroyPointlessEdges)
+          {
+            this.graph.destroyEdge(target);
+          }
+          //Keep edges as placeholders (used in DFA's)
+          else
+          {
+            //TODO: should actually save the edge as a placeholder...
+            this.graph.destroyEdge(target);
+            /*
+            const dx = target.from.x - x;
+            const dy = target.from.y - y;
+            const angle = Math.atan2(dy, dx) - Math.PI;
+            target.to = { x: PLACEHOLDER_LENGTH * Math.cos(angle), y: PLACEHOLDER_LENGTH * Math.sin(angle) };
+            target.quad = null;
+
+            //Open label editor if default edge...
+            if (target.label == STR_TRANSITION_PROXY_LABEL)
+            {
+              target.label = STR_TRANSITION_DEFAULT_LABEL;
+              this.mainController.openLabelEditor(target);
+            }
+            */
+          }
         }
         else
         {
+          //Open label editor if default edge...
           if (target.label == STR_TRANSITION_PROXY_LABEL)
           {
             target.label = STR_TRANSITION_DEFAULT_LABEL;
@@ -79,10 +104,17 @@ class MoveCursorConstroller extends CursorController
 
     if (targetType == "node")
     {
-      //If cursor.hasSelectedStates : move them all!!!
+      //TODO: If cursor.hasSelectedStates : move them all!!!
       //Otherwise:
-      target.x = x - this.graph.centerX;
-      target.y = y - this.graph.centerY;
+      if (this.mainController.isWithinTrash(0, 0))
+      {
+        this.graph.destroyNode(target);
+      }
+      else
+      {
+        target.x = x - this.graph.centerX;
+        target.y = y - this.graph.centerY;
+      }
       return true;
     }
     else if (targetType == "edge")

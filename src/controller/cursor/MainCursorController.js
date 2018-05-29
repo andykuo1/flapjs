@@ -82,6 +82,8 @@ class MainCursorController
 
     this.target = null;
     this.targetType = null;
+
+    this.shouldDestroyPointlessEdges = false;
   }
 
   load()
@@ -395,6 +397,7 @@ class MainCursorController
     //TODO: this should really be in moveCursor, but moveMode needs to be here...
     if (this.targetType == "endpoint")
     {
+      //TODO: Do not allow user to create quadratics on placeholder edges
       const quad = this.target.quad;
       if (quad != null)
       {
@@ -409,6 +412,11 @@ class MainCursorController
     }
 
     this.moveCursor.moveTarget(this.cursor, this.target, this.targetType, this.mouse.x, this.mouse.y);
+  }
+
+  isWithinTrash(x, y)
+  {
+    return false;
   }
 }
 

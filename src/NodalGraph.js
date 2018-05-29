@@ -43,6 +43,23 @@ export class NodalGraph
 
   destroyNode(node)
   {
+    //Make sure that any connections to this node are resolved before removal
+    let edge = null;
+    for(let i = this.edges.length - 1; i >= 0; --i)
+    {
+      edge = this.edges[i];
+      if (edge.from == node)
+      {
+        //Delete any edges that have this node as a source
+        this.edges.splice(i, 1);
+        this.emit("edgeDestroy", edge);
+      }
+      else if (edge.to == node)
+      {
+        //Return any edges that have this node as a destination
+        //TODO: Implement return edges
+      }
+    }
     this.nodes.splice(this.nodes.indexOf(node), 1);
     this.emit("nodeDestroy", node);
   }
@@ -274,6 +291,11 @@ export class Edge
   isSelfLoop()
   {
     return this.from == this.to;
+  }
+
+  isPlaceholder()
+  {
+    return !(this.to instanceof Node);
   }
 }
 
