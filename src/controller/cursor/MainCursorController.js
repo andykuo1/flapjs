@@ -82,8 +82,10 @@ class MainCursorController
 
     this.target = null;
     this.targetType = null;
-    
+
     this.shouldDestroyPointlessEdges = false;
+    this.trashArea = { x: TRASH_AREA_POSX, y: TRASH_AREA_POSY,
+                        width: TRASH_AREA_WIDTH, height: TRASH_AREA_HEIGHT };
   }
 
   load()
@@ -109,7 +111,24 @@ class MainCursorController
 
     this.selectCursor.draw(ctx);
 
+    this.drawTrashArea(ctx);
     this.drawHoverInformation(ctx, mx, my);
+  }
+
+  drawTrashArea(ctx)
+  {
+    ctx.save();
+    {
+      ctx.shadowColor = TRASH_AREA_SHADOW_COLOR;
+      ctx.shadowBlur = TRASH_AREA_SHADOW_SIZE;
+      ctx.shadowOffsetX = TRASH_AREA_SHADOW_OFFSETX;
+      ctx.shadowOffsetY = TRASH_AREA_SHADOW_OFFSETY;
+      ctx.fillStyle = TRASH_AREA_FILL_STYLE;
+      ctx.strokeStyle = TRASH_AREA_STROKE_STYLE;
+      ctx.fillRect(this.trashArea.x, this.trashArea.y, this.trashArea.width, this.trashArea.height);
+      ctx.strokeRect(this.trashArea.x, this.trashArea.y, this.trashArea.width, this.trashArea.height);
+    }
+    ctx.restore();
   }
 
   drawHoverInformation(ctx, x, y)
@@ -416,8 +435,10 @@ class MainCursorController
 
   isWithinTrash(x, y)
   {
-    //TODO: implement trash area
-    return false;
+    const dx = x - this.trashArea.x;
+    const dy = y - this.trashArea.y;
+    return dx > 0 && dx < this.trashArea.width &&
+            dy > 0 && dy < this.trashArea.height;
   }
 }
 

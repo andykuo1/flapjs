@@ -59,13 +59,22 @@ class MoveCursorConstroller extends CursorController
           //Keep edges as placeholders (used in DFA's)
           else
           {
-            target.makePlaceholder();
-
-            //Open label editor if default edge...
-            if (target.label == STR_TRANSITION_PROXY_LABEL)
+            //But delete it if withing trash area...
+            if (this.mainController.isWithinTrash(x, y))
             {
-              target.label = STR_TRANSITION_DEFAULT_LABEL;
-              this.mainController.openLabelEditor(target);
+              this.graph.destroyEdge(target);
+            }
+            //Otherwise, make it a placeholder
+            else
+            {
+              target.makePlaceholder();
+
+              //Open label editor if default edge...
+              if (target.label == STR_TRANSITION_PROXY_LABEL)
+              {
+                target.label = STR_TRANSITION_DEFAULT_LABEL;
+                this.mainController.openLabelEditor(target);
+              }
             }
           }
         }
