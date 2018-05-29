@@ -33,9 +33,9 @@ const SELF_LOOP_HEIGHT = 32;
 //Interface
 const DOUBLE_TAP_TICKS = 20;
 const SPAWN_RADIUS = 64;
-const CLICK_RADIUS_SQU = 4;
+
+//Graph sorting
 const PADDING_RADIUS_SQU = 2304;
-const PHYSICS_TICKS = 100;
 
 //Colors
 const STATE_BASE_COLOR = "#EDEBA6";
