@@ -1,5 +1,4 @@
 import NodalGraphSorter from 'NodalGraphSorter.js';
-import NodalGraphExporter from 'NodalGraphExporter.js';
 
 class MainButtonController
 {
@@ -7,7 +6,7 @@ class MainButtonController
   {
     this.canvas = canvas;
     this.graph = graph;
-    
+
     this.cursorController = cursorController;
   }
 

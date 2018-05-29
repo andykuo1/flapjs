@@ -1,5 +1,5 @@
 import LabelEditor from 'controller/LabelEditor.js';
-import GraphCursor from 'GraphCursor.js';
+import GraphCursor from 'controller/GraphCursor.js';
 
 import EditCursorController from 'controller/cursor/EditCursorController.js';
 import MoveCursorController from 'controller/cursor/MoveCursorController.js';
@@ -134,6 +134,16 @@ class MainCursorController
     {
       this.target = null;
       this.targetType = null;
+    }
+
+    //TODO: should be in editCursor, but there is not onMouseDown event...
+    if (this.editCursor.hasSelection())
+    {
+      //Unselect everything is clicked on something other than nodes...
+      if (this.targetType != "node" || !this.editCursor.selectBox.targets.includes(this.target))
+      {
+        this.editCursor.clearSelection();
+      }
     }
   }
 
