@@ -1,11 +1,64 @@
 import LabelEditor from 'controller/LabelEditor.js';
 import GraphCursor from 'GraphCursor.js';
-import NodalGraphRenderer from 'NodalGraphRenderer.js';
 
 import EditCursorController from 'controller/cursor/EditCursorController.js';
 import MoveCursorController from 'controller/cursor/MoveCursorController.js';
+import HoverCursorController from 'controller/cursor/HoverCursorController.js';
 
-class MainController
+
+/*
+onSingleTap
+  Edit Mode
+    OnState
+      - Toggle target acceptState
+    OnEdge
+      - Edit label
+
+onDoubleTap
+  Edit Mode
+    OnEmpty
+      - Create new state at position
+
+onStartDragging
+  Edit Mode
+    OnState
+      - Create new edge, and move enter move mode for its endpoint
+    OnEmpty
+      - Begin selection box
+  Move Mode
+    OnState
+      - Set drag target to state
+    OnEdge
+      - Set drag target to edge
+    OnEdgeEndPoint
+      - Set drag target to edge endpoint
+    OnEmpty
+      - Set drag target to graph
+
+OnDragging
+  Draw drag targets
+  Draw selection box
+
+onStopDragging
+  Edit Mode
+    - Mark all selected targets in selection box (save position to all targets)
+  Move Mode
+    OnState
+      If is selected state:
+        - Drag the marked targets to cursor, while maintaining interdistance
+      Otherwise:
+        - Drag the state to cursor
+    OnEdge
+      - Drag the edge to cursor
+    OnEdgeEndPoint
+      - Drag the endpoint of edge to cursor
+    OnEmpty
+      - Drag the graph to cursor
+
+NOTES:
+- Dragging does not start until cursor leaves the object it is dragging (or is in move mode?)
+*/
+class MainCursorController
 {
   constructor(graph, mouse)
   {
@@ -17,13 +70,11 @@ class MainController
 
     this.editCursor = new EditCursorController(this, this.graph);
     this.moveCursor = new MoveCursorController(this, this.graph);
+    this.hoverCursor = new HoverCursorController(this);
 
     this.moveMode = false;
 
-    this.tap = {
-      x: 0,
-      y: 0
-    };
+    this.tap = { x: 0, y: 0 };
     this.doubleTapTicks = 0;
     this.isDown = false;
     this.isDragging = false;
@@ -38,6 +89,24 @@ class MainController
     this.mouse.on('mouseup', this.onMouseUp.bind(this));
     this.mouse.on('mouseexit', this.onMouseExit.bind(this));
     this.mouse.on('mousemove', this.onMouseMove.bind(this));
+  }
+
+  update(dt)
+  {
+    if (this.doubleTapTicks > 0)
+    {
+      --this.doubleTapTicks;
+    }
+  }
+
+  draw(ctx)
+  {
+    const mx = this.mouse.x;
+    const my = this.mouse.y;
+
+    this.editCursor.draw(ctx);
+
+    this.hoverCursor.drawHoverInformation(ctx, this.cursor, mx, my);
   }
 
   onMouseDown(mouse, button)
@@ -73,16 +142,13 @@ class MainController
     const mx = mouse.x;
     const my = mouse.y;
     this.isDown = false;
+
     if (this.isDragging)
     {
       this.doStopDragging(mx, my);
       this.isDragging = false;
-      this.target = null;
-      this.targetType = null;
-      return;
     }
-
-    if (this.doubleTapTicks > 0)
+    else if (this.doubleTapTicks > 0)
     {
       if (!this.doDoubleTap(mx, my))
       {
@@ -103,10 +169,7 @@ class MainController
   {
     if (this.isDragging)
     {
-      if (this.moveMode && this.target != null)
-      {
-        this.moveCursor.moveTarget(this.cursor, this.target, this.targetType, x, y);
-      }
+      this.doDragging(x, y);
       return;
     }
     if (!this.isDown) return;
@@ -165,72 +228,6 @@ class MainController
     }
   }
 
-  update(dt)
-  {
-    if (this.doubleTapTicks > 0)
-    {
-      --this.doubleTapTicks;
-    }
-  }
-
-  draw(ctx)
-  {
-    const mx = this.mouse.x;
-    const my = this.mouse.y;
-
-    //Hover information...
-    let selectTarget = null;
-    let selectType = null;
-
-    if (selectTarget = this.target)
-    {
-      selectTarget = this.target;
-      selectType = this.targetType;
-    }
-    else if (selectTarget = this.cursor.getNodeAt(mx, my))
-    {
-      selectType = "node";
-    }
-    else if (selectTarget = this.cursor.getEdgeAt(mx, my))
-    {
-      selectType = "edge";
-    }
-    else if (selectTarget = this.cursor.getEdgeByEndPointAt(mx, my))
-    {
-      selectType = "endpoint";
-    }
-
-    if (selectTarget != null)
-    {
-      let x = 0;
-      let y = 0;
-      let r = CURSOR_RADIUS;
-      switch(selectType)
-      {
-        case "node":
-          x = selectTarget.x;
-          y = selectTarget.y;
-          r = NODE_RADIUS;
-          break;
-        case "edge":
-          x = selectTarget.x;
-          y = selectTarget.y;
-          r = EDGE_RADIUS;
-          break;
-        case "endpoint":
-          const endpoint = selectTarget.getEndPoint();
-          x = endpoint[0];
-          y = endpoint[1];
-          r = ENDPOINT_RADIUS;
-          break;
-        default:
-          x = mx;
-          y = my;
-      }
-      NodalGraphRenderer.drawHoverCircle(ctx, x, y, r + HOVER_RADIUS_OFFSET);
-    }
-  }
-
   doSingleTap(x, y)
   {
     if (this.moveMode)
@@ -264,6 +261,18 @@ class MainController
     else
     {
       return this.editCursor.onStartDragging(this.cursor, x, y, this.target, this.targetType);
+    }
+  }
+
+  doDragging(x, y)
+  {
+    if (this.moveMode)
+    {
+      return this.moveCursor.onDragging(this.cursor, x, y, this.target, this.targetType);
+    }
+    else
+    {
+      return this.editCursor.onDragging(this.cursor, x, y, this.target, this.targetType);
     }
   }
 
@@ -327,4 +336,4 @@ class MainController
   }
 }
 
-export default MainController;
+export default MainCursorController;

@@ -27,6 +27,17 @@ class MoveCursorConstroller extends CursorController
     return true;
   }
 
+  onDragging(cursor, x, y, target, targetType)
+  {
+    if (target != null)
+    {
+      this.moveTarget(cursor, target, targetType, x, y);
+      return true;
+    }
+
+    return false;
+  }
+
   onStopDragging(cursor, x, y, target, targetType)
   {
     let result = false;

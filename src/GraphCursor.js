@@ -1,21 +1,21 @@
-import Eventable from 'util/Eventable.js';
-
-class GraphCursor //mixin Eventable
+class GraphCursor
 {
   constructor(graph, mouse)
   {
     this.graph = graph;
     this.mouse = mouse;
+  }
 
-    this.prevTargetX = 0;
-    this.prevTargetY = 0;
-    this.prevTargetNode = null;
-    this.prevTargetEdge = null;
-    this.prevTargetEndPoint = null;
-
-    this.targetSource = null;
-    this.targetDestination = null;
-    this.targetMode = null;
+  getNodesWithin(fromX, fromY, toX, toY, dst)
+  {
+    for(const node of this.graph.nodes)
+    {
+      if (node.x >= fromX && node.x < toX &&
+          node.y >= fromY && node.y < toY)
+      {
+        dst.push(node);
+      }
+    }
   }
 
   getNodeAt(x, y)
@@ -35,8 +35,6 @@ class GraphCursor //mixin Eventable
 
   getEdgeAt(x, y)
   {
-    //if (this.prevTargetX == x && this.prevTargetY == y) return this.prevTargetEdge;
-
     for(const edge of this.graph.edges)
     {
       const dx = x - edge.x;
@@ -52,8 +50,6 @@ class GraphCursor //mixin Eventable
 
   getEdgeByEndPointAt(x, y)
   {
-    //if (this.prevTargetX == x && this.prevTargetY == y) return this.prevTargetEndPoint;
-
     for(const edge of this.graph.edges)
     {
       const point = edge.getEndPoint();
@@ -68,6 +64,5 @@ class GraphCursor //mixin Eventable
     return null;
   }
 }
-Object.assign(GraphCursor.prototype, Eventable);
 
 export default GraphCursor;

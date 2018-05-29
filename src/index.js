@@ -23,21 +23,20 @@ function onAnimationFrame(time)
 }
 
 //Setup application
-import NodalGraphController from 'NodalGraphController.js';
 import NodalGraphRenderer from 'NodalGraphRenderer.js';
-import NodalGraphSorter from 'NodalGraphSorter.js';
-import NodalGraphExporter from 'NodalGraphExporter.js';
 
-import MainController from 'controller/cursor/MainController.js';
+import MainCursorController from 'controller/cursor/MainCursorController.js';
+import MainButtonController from 'controller/button/MainButtonController.js';
 
 import { NodalGraph } from 'NodalGraph.js';
 
 const graph = new NodalGraph(canvas);
-const controller = new MainController(graph, mouse); //new NodalGraphController(canvas, mouse, graph);
-const exporter = new NodalGraphExporter(graph);
+const cursorController = new MainCursorController(graph, mouse);
+const buttonController = new MainButtonController(canvas, graph, cursorController);
 
 function onCanvasLoad()
 {
+  //DEBUG: For testing...
   let node = null;
   let node2 = null;
   let edge = null;
@@ -52,8 +51,10 @@ function onCanvasLoad()
   node2.label = "q1";
   edge = graph.createNewEdge(node, node2);
   edge.label = "abc 0";
+  //END OF DEBUG CODE
 
-  controller.load();
+  cursorController.load();
+  buttonController.load();
 }
 
 let avgFramesPerSecond = 60;
@@ -61,10 +62,13 @@ let prevTime = 0;
 function onCanvasDraw(ctx, time)
 {
   const dt = (time - prevTime) / avgFramesPerSecond;
+
   graph.update(dt);
-  controller.update(dt);
-  NodalGraphSorter.update(dt, graph);
+  cursorController.update(dt);
+  buttonController.update(dt);
+
   NodalGraphRenderer.render(ctx, dt, graph);
-  controller.draw(ctx);
+  cursorController.draw(ctx);
+
   prevTime = time;
 }
