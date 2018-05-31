@@ -26,7 +26,7 @@ To make a program that is more accessible and intuitive to use, so we can become
   - [x] Component deletion
   - [x] Edge redirection
   - [x] Label editing
-- [~] Formal Definition summary
+- [ ] Formal Definition summary
   - [x] States
   - [x] Symbols
   - [x] Transitions
@@ -35,8 +35,8 @@ To make a program that is more accessible and intuitive to use, so we can become
   - [ ] Tape Symbols
   - [ ] q_acc
   - [ ] q_rej
-- [~] String testing
-  - [~] DFA
+- [ ] String testing
+  - [ ] DFA
   - [x] NFA
 - [ ] Tape testing
   - [ ] PDA
