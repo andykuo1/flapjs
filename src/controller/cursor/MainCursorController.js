@@ -388,8 +388,7 @@ class MainCursorController
 
   createNewState(x, y)
   {
-    const node = this.graph.createNewNode();
-    node.label = STR_STATE_LABEL + (this.graph.nodes.length - 1);
+    const node = this.graph.createNewNode(x, y, STR_STATE_LABEL + (this.graph.nodes.length));
     node.x = x || (Math.random() * SPAWN_RADIUS * 2) - SPAWN_RADIUS;
     node.y = y || (Math.random() * SPAWN_RADIUS * 2) - SPAWN_RADIUS;
     return node;
@@ -397,8 +396,7 @@ class MainCursorController
 
   createNewTransition(src, dst, label=STR_TRANSITION_DEFAULT_LABEL)
   {
-    const edge = this.graph.createNewEdge(src, dst);
-    edge.label = label;
+    const edge = this.graph.createNewEdge(src, dst, label);
     return edge;
   }
 

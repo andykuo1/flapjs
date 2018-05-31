@@ -1,6 +1,7 @@
+import Mouse from 'util/Mouse.js';
+
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
-import Mouse from 'util/Mouse.js';
 const mouse = new Mouse(canvas, canvas);
 
 //Setup canvas
@@ -24,6 +25,7 @@ function onAnimationFrame(time)
 
 //Setup application
 import NodalGraphRenderer from 'NodalGraphRenderer.js';
+import GraphParser from 'parser/GraphParser.js';
 
 import MainCursorController from 'controller/cursor/MainCursorController.js';
 import MainButtonController from 'controller/button/MainButtonController.js';
@@ -31,6 +33,7 @@ import MainButtonController from 'controller/button/MainButtonController.js';
 import { NodalGraph } from 'NodalGraph.js';
 
 const graph = new NodalGraph(canvas);
+const parser = new GraphParser(graph);
 const cursorController = new MainCursorController(graph, mouse);
 const buttonController = new MainButtonController(canvas, graph, cursorController);
 
@@ -41,16 +44,9 @@ function onCanvasLoad()
   let node2 = null;
   let edge = null;
 
-  node = graph.createNewNode();
-  node.x = -64;
-  node.y = 0;
-  node.label = "q0";
-  node2 = graph.createNewNode();
-  node2.x = 64;
-  node2.y = 0;
-  node2.label = "q1";
-  edge = graph.createNewEdge(node, node2);
-  edge.label = "abc 0";
+  node = graph.createNewNode(-64, 0, "q0");
+  node2 = graph.createNewNode(64, 0, "q1");
+  edge = graph.createNewEdge(node, node2, "abc 0");
   //END OF DEBUG CODE
 
   cursorController.load();
@@ -66,6 +62,7 @@ function onCanvasDraw(ctx, time)
   graph.update(dt);
   cursorController.update(dt);
   buttonController.update(dt);
+  parser.parse(graph);
 
   NodalGraphRenderer.render(ctx, dt, graph);
   cursorController.draw(ctx);

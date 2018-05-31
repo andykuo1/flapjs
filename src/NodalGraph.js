@@ -2,8 +2,11 @@ import Eventable from 'util/Eventable.js';
 
 //nodeCreate(node) - Whenever a new node is created
 //nodeDestroy(node) - Whenever a node is destroyed (even on clear)
+//nodeLabel(node, newLabel, oldLabel) - Whenever a node label changes
 //edgeCreate(edge) - Whenever a new edge is created
 //edgeDestroy(edge) - Whenever an edge is destroyed (even on clear)
+//edgeLabel(edge, newLabel, oldLabel) - Whenever a node label changes
+
 //toggleAccept(node) - Whenever a node changes to an accept state, or vice versa
 //newInitial(node, oldNode) - Whenever a node becomes the initial state; oldNode could be null
 export class NodalGraph
@@ -29,9 +32,9 @@ export class NodalGraph
   set offsetX(value) { this.nextOffsetX = value; }
   set offsetY(value) { this.nextOffsetY = value; }
 
-  createNewNode()
+  createNewNode(x, y, label)
   {
-    const result = new Node(this, 0, 0);
+    const result = new Node(this, x, y, label);
     if (this.nodes.length == 0)
     {
       this.emit("newInitial", result, null);
@@ -60,13 +63,18 @@ export class NodalGraph
         edge.makePlaceholder();
       }
     }
-    this.nodes.splice(this.nodes.indexOf(node), 1);
+    let nodeIndex = this.nodes.indexOf(node);
+    this.nodes.splice(nodeIndex, 1);
+    if (nodeIndex == 0)
+    {
+      this.emit("newInitial", this.getInitialState(), node);
+    }
     this.emit("nodeDestroy", node);
   }
 
-  createNewEdge(from, to)
+  createNewEdge(from, to, label)
   {
-    const result = new Edge(this, from, to);
+    const result = new Edge(this, from, to, label);
     if (result.isSelfLoop()) result.y = from.y - SELF_LOOP_HEIGHT;
     this.edges.push(result);
     this.emit("edgeCreate", result);
@@ -134,7 +142,7 @@ export class Node
   constructor(graph, x=0, y=0, label="q")
   {
     this.graph = graph;
-    this.label = label;
+    this._label = label;
     this._x = x;
     this._y = y;
     this.nextX = x;
@@ -148,6 +156,13 @@ export class Node
   set x(value) { this.nextX = value; }
   set y(value) { this.nextY = value; }
 
+  get label() { return this._label; }
+  set label(value) {
+    let prevLabel = this._label;
+    this._label = value;
+    this.graph.emit("nodeLabel", this, this._label, prevLabel);
+  }
+
   update(dt)
   {
     this._x = lerp(this._x, this.nextX, dt);
@@ -160,7 +175,7 @@ export class Edge
   constructor(graph, from, to, label="#")
   {
     this.graph = graph;
-    this.label = label;
+    this._label = label;
     this.from = from;
     this.to = to;
 
@@ -291,6 +306,13 @@ export class Edge
     this.quad.y = value - this.centerY;
     if (Math.abs(this.quad.y) < 8) this.quad.y = 0;
     if (this.quad.x == 0 && this.quad.y == 0) this.quad = null;
+  }
+
+  get label() { return this._label; }
+  set label(value) {
+    let prevLabel = this._label;
+    this._label = value;
+    this.graph.emit("edgeLabel", this, this._label, prevLabel);
   }
 
   makePlaceholder()
