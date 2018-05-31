@@ -212,66 +212,50 @@ The program should also be able to save / load graphs.
 ### *(Non) Deterministic Finite Automaton*
 #### DFA = {Q, SIGMA, DELTA, q0, F}
 ##### Q: (Single-Click) to create state.
+- [key=SPACE] to create state, connected to current state, then move to that state.
+- [key=SHIFT-SPACE] to create state, connected to current state, then not move.
+- [key=CTRL-SPACE] to create state, with no connections, then move to that state.
+- [key=HOME / END] to move to start or cycle final states.
+- [key=LEFT / RIGHT / UP / DOWN] to move to start if none selected, or move to left / right / up / down nearest state. If none found, move to nearest state.
+- [key=SHIFT-LEFT / SHIFT-RIGHT / SHIFT-UP / SHIFT-DOWN] to select left / right / up / down connected state, then continue to cycle through connected states. When release [SHIFT], cursor will move to that state.
 
-[key=SPACE] to create state, connected to current state, then move to that state.
 
-[key=SHIFT-SPACE] to create state, connected to current state, then not move.
+- To delete state:
+  - (Click-Drag: “move”) the state to TRASH CAN.
+  - [key=DELETE] to delete current state.
+  - (Src edges will be deleted, but dst edges return.)
 
-[key=CTRL-SPACE] to create state, with no connections, then move to that state.
 
-[key=HOME / END] to move to start or cycle final states.
+- To move the state around:
+  - (Click-Drag: “move”) the state.
 
-[key=LEFT / RIGHT / UP / DOWN] to move to start if none selected, or move to left / right / up / down nearest state. If none found, move to nearest state.
 
-[key=SHIFT-LEFT / SHIFT-RIGHT / SHIFT-UP / SHIFT-DOWN] to select left / right / up / down connected state, then continue to cycle through connected states. When release [SHIFT], cursor will move to that state.
-
-To delete state:
-
-(Click-Drag: “move”) the state to TRASH CAN.
-
-[key=DELETE] to delete current state.
-
-(Src edges will be deleted, but dst edges return.)
-
-To move the state around:
-
-(Click-Drag: “move”) the state.
-
-(If on mobile: “move” inputs are ignored unless MOVESTATE is active. There should be a button that can be toggled on tap, or held down to activate MOVESTATE. This should resolve the conflict with creating edges.)
-
-(If DFA: Every state should already have edges for every SIGMA)
-
-(If DFA: Should create with initial values of 0)
-
-(If NFA: Should create with initial values as EMPTY_STRING)
+- (If on mobile: “move” inputs are ignored unless MOVESTATE is active. There should be a button that can be toggled on tap, or held down to activate MOVESTATE. This should resolve the conflict with creating edges.)
+- (If DFA: Every state should already have edges for every SIGMA)
+- (If DFA: Should create with initial values of 0)
+- (If NFA: Should create with initial values as EMPTY_STRING)
 
 ##### SIGMA: Implied from DELTA.
-
-(If NFA: empty string is also a symbol)
+- (If NFA: empty string is also a symbol)
 
 ##### DELTA: (Click-Drag) to create edge.
+- To change read symbol:
+  - (Single-Click) center, then it will open a text field.
+  - [key=TAB] to cycle through labels from current state
 
-To change read symbol:
 
-(Single-Click) center, then it will open a text field.
+- To change the destination:
+  - (Click-Drag) endpoint to state.
 
-[key=TAB] to cycle through labels from current state
 
-To change the destination:
+- To delete edge:
+  - (Click-Drag) endpoint to empty space.
+  - [key=DELETE] to delete current edge.
+  - (If DFA: you cannot delete; it will just return to src state)
 
-(Click-Drag) endpoint to state.
 
-To delete edge:
-
-(Click-Drag) endpoint to empty space.
-
-[key=DELETE] to delete current edge.
-
-(If DFA: you cannot delete; it will just return to src state)
-
-To bend arrow:
-
-(Click-Drag: “move”) center
+- To bend arrow:
+  - (Click-Drag: “move”) center
 
 ##### q0: Implied. The first state created.
 
@@ -280,22 +264,21 @@ To bend arrow:
 ### *Pushdown Automaton*
 #### PDA = {Q, SIGMA, GAMMA, DELTA, q0, F}
 ##### Q: Same as DFA.
-
-(Should create with initial values as EMPTY_STRING)
+- (Should create with initial values as EMPTY_STRING)
 
 ##### SIGMA: Same as DFA.
 
 ##### GAMMA: Implied from DELTA.
 
 ##### DELTA: Same as DFA.
+- To change read symbol: Same as DFA.
 
-To change read symbol: Same as DFA.
 
-To change pop symbol: Same as DFA for read symbols.
+- To change pop symbol: Same as DFA for read symbols.
 
-To change push symbol: Same as DFA for read symbols.
 
-[key=SPACE] while editing label to goto next symbol.
+- To change push symbol: Same as DFA for read symbols.
+  - [key=SPACE] while editing label to goto next symbol.
 
 ##### q0: Same as DFA.
 
@@ -304,8 +287,7 @@ To change push symbol: Same as DFA for read symbols.
 ### *Turing Machines*
 #### TM = {Q, SIGMA, GAMMA, DELTA, q0, q_acc, q_rej}
 ##### Q: Same as DFA.
-
-(Should create with initial values as EMPTY_STRING)
+- (Should create with initial values as EMPTY_STRING)
 
 ##### SIGMA: Same as DFA.
 
@@ -313,63 +295,53 @@ To change push symbol: Same as DFA for read symbols.
 
 ##### DELTA: Same as DFA.
 
-To change read symbol: Same as DFA.
+- To change read symbol: Same as DFA.
 
-To change write symbol: Same as DFA for read symbols.
 
-To change move symbol: Same as DFA for read symbols.
+- To change write symbol: Same as DFA for read symbols.
 
-(this should be automatically capitalized)
 
-[key=SPACE] while editing label to goto next symbol.
+- To change move symbol: Same as DFA for read symbols.
+  - (this should be automatically capitalized)
+  - [key=SPACE] while editing label to goto next symbol.
 
 ##### q0: Same as DFA.
 
 ##### q_acc: Implied. Created at beginning, not connected to anything.
-
-??? (How to connect q_acc by keyboard?)
+- ??? (How to connect q_acc by keyboard?)
 
 ##### q_rej: Implied. Created at beginning.
-
-(Can be toggled in options, whether to be visible)
-
-(Can be toggled in options, whether to automatically connect all unspecified states to q_rej, as by convention)
+- (Can be toggled in options, whether to be visible)
+- (Can be toggled in options, whether to automatically connect all unspecified states to q_rej, as by convention)
 
 ## **Formal Definition (Keyboard only)**
 ### *Deterministic Finite Automaton*
 #### DFA = {Q, SIGMA, DELTA, q0, F}
-
-Nothing so far.
+- Nothing so far.
 
 ### Nondeterministic Finite Automaton
 #### NFA = {Q, SIGMA, DELTA, q0, F} (where empty string is a symbol)
-
-Nothing so far.
+- Nothing so far.
 
 ### Pushdown Automaton
 #### PDA = {Q, SIGMA, GAMMA, DELTA, q0, F}
-
-Nothing so far.
+- Nothing so far.
 
 ### Turing Machines
 #### TM = {Q, SIGMA, GAMMA, DELTA, q0, q_acc, q_rej}
-
-Nothing so far.
+- Nothing so far.
 
 ## String Parsing (Keyboard only)
-
-Nothing so far.
+- Nothing so far.
 
 ## String Testing / Tape Testing
-
-Input field and then run the string on the current graph.
+- Input field and then run the string on the current graph.
 
 ## Auto-Layout
-
-Progression-Based Horizontal / Vertical
-Circular
-Outward
-Scatter
+- Progression-Based Horizontal / Vertical
+- Circular
+- Outward
+- Scatter
 
 
 ## Other Notes
