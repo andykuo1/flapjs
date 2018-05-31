@@ -25,7 +25,7 @@ class GraphController
     const buttonTest = document.getElementById("test_execute");
     buttonTest.addEventListener('click', (event) => {
       alert(this.test((inputTest.value || "")[Symbol.iterator]()) ? "SUCCESS!" : "FAILED!");
-      inputTest.value = "";
+      inputTest.select();
     });
     inputTest.addEventListener('keyup', (e) => {
       if (e.keyCode == SUBMIT_KEY)
