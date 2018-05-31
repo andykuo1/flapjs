@@ -6,7 +6,7 @@ import Eventable from 'util/Eventable.js';
 //edgeCreate(edge) - Whenever a new edge is created
 //edgeDestroy(edge) - Whenever an edge is destroyed (even on clear)
 //edgeLabel(edge, newLabel, oldLabel) - Whenever a node label changes
-
+//edgeDestination(edge, newDestination, oldDestination) - Whenever a node changes destination
 //toggleAccept(node) - Whenever a node changes to an accept state, or vice versa
 //newInitial(node, oldNode) - Whenever a node becomes the initial state; oldNode could be null
 export class NodalGraph
@@ -126,7 +126,6 @@ export class NodalGraph
   toggleAcceptState(node)
   {
     node.accept = !node.accept;
-    this.emit("toggleAccept", node);
   }
 
   getInitialState()
@@ -142,12 +141,13 @@ export class Node
   constructor(graph, x=0, y=0, label="q")
   {
     this.graph = graph;
-    this._label = label;
     this._x = x;
     this._y = y;
     this.nextX = x;
     this.nextY = y;
-    this.accept = false;
+
+    this._label = label;
+    this._accept = false;
   }
 
   get x() { return this._x + this.graph.centerX; }
@@ -163,6 +163,13 @@ export class Node
     this.graph.emit("nodeLabel", this, this._label, prevLabel);
   }
 
+  get accept() { return this._accept; }
+  set accept(value) {
+    let prevAccept = this._accept;
+    this._accept = value;
+    this.graph.emit("toggleAccept", this, this._accept, prevAccept);
+  }
+
   update(dt)
   {
     this._x = lerp(this._x, this.nextX, dt);
@@ -176,8 +183,8 @@ export class Edge
   {
     this.graph = graph;
     this._label = label;
-    this.from = from;
-    this.to = to;
+    this._from = from;
+    this._to = to;
 
     this.quad = null;
   }
@@ -313,6 +320,14 @@ export class Edge
     let prevLabel = this._label;
     this._label = value;
     this.graph.emit("edgeLabel", this, this._label, prevLabel);
+  }
+
+  get from() { return this._from; }
+  get to() { return this._to; }
+  set to(value) {
+    let prevDst = this._to;
+    this._to = value;
+    this.graph.emit("edgeDestination", this, this._to, prevDst);
   }
 
   makePlaceholder()

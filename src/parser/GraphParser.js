@@ -13,55 +13,35 @@ class GraphParser
     this.states = [];
     this.symbols = [];
 
-    this.graph.on("nodeCreate", this.evaluateNode.bind(this));
-    this.graph.on("nodeDestroy", this.evaluateNode.bind(this));
-    this.graph.on("edgeCreate", this.evaluateEdge.bind(this));
-    this.graph.on("edgeDestroy", this.evaluateEdge.bind(this));
-    this.graph.on("nodeLabel", this.evaluateNodeLabel.bind(this));
-    this.graph.on("edgeLabel", this.evaluateEdgeLabel.bind(this));
+    this.graph.on("nodeCreate", this.onNode.bind(this));
+    this.graph.on("nodeDestroy", this.onNode.bind(this));
+    this.graph.on("nodeLabel", this.onNode.bind(this));
+    this.graph.on("edgeCreate", this.onEdge.bind(this));
+    this.graph.on("edgeDestroy", this.onEdge.bind(this));
+    this.graph.on("edgeLabel", this.onEdge.bind(this));
+    this.graph.on("edgeDestination", this.onEdgeDestination.bind(this))
 
-    this.graph.on("newInitial", this.evaluateInitialNode.bind(this));
+    this.graph.on("newInitial", this.onNewInitial.bind(this));
+    this.graph.on("toggleAccept", this.onToggleAccept.bind(this));
   }
 
-  evaluateInitialNode(node, oldNode)
+  evaluateStates()
   {
-    if (!node) return;
-
-    this.startStateElement.innerText = node.label;
-  }
-
-  evaluateNode(node)
-  {
-    this.evaluateNodeLabel(node, node.label);
-  }
-
-  evaluateEdge(edge)
-  {
-    this.evaluateEdgeLabel(edge, edge.label);
-  }
-
-  evaluateNodeLabel(node, newLabel, oldLabel)
-  {
-    if (this.graph.getInitialState() == node)
-    {
-      this.evaluateInitialNode(node, null);
-    }
-
-    let stateLabels = [];
+    let result = [];
     for(const node of this.graph.nodes)
     {
       if (!node.label) continue;
 
-      stateLabels.push(node.label);
+      result.push(node.label);
     }
-    stateLabels.sort();
+    result.sort();
 
-    this.statesElement.innerText = stateLabels.join(", ");
+    this.statesElement.innerText = result.join(", ");
   }
 
-  evaluateEdgeLabel(edge, newLabel, oldLabel)
+  evaluateSymbols()
   {
-    let edgeLabels = [];
+    let result = [];
     for(const edge of this.graph.edges)
     {
       if (!edge.label) continue;
@@ -69,15 +49,104 @@ class GraphParser
       const labels = edge.label.split(" ");
       for(const label of labels)
       {
-        if (!edgeLabels.includes(label))
+        if (!result.includes(label))
         {
-          edgeLabels.push(label);
+          result.push(label);
         }
       }
     }
-    edgeLabels.sort();
+    result.sort();
 
-    this.symbolsElement.innerText = edgeLabels.join(", ");
+    this.symbolsElement.innerText = result.join(", ");
+  }
+
+  evaluateTransitions()
+  {
+    let result = [];
+    for(const edge of this.graph.edges)
+    {
+      if (!edge.label) continue;
+
+      const labels = edge.label.split(" ");
+      for(const label of labels)
+      {
+        const fromLabel = edge.from ? edge.from.label : "undefined";
+        const toLabel = edge.to ? edge.to.label : "undefined";
+        result.push("<li>(" + fromLabel + ", " + label + ") &rarr; " + toLabel);
+      }
+    }
+    result.sort();
+
+    this.transitionsElement.innerHTML = result.join(",</li>");
+  }
+
+  evaluateStartState()
+  {
+    const node = this.graph.getInitialState();
+    this.startStateElement.innerText = node ? node.label : "";
+  }
+
+  evaluateFinalStates()
+  {
+    let result = [];
+    for(const node of this.graph.nodes)
+    {
+      if (!node.label) continue;
+
+      if (!node.accept) continue;
+      result.push(node.label);
+    }
+    result.sort();
+
+    this.finalStatesElement.innerText = result.join(", ");
+  }
+
+  onNode(node)
+  {
+    //Change label for initial if the label for it changed...
+    if (this.graph.getInitialState() == node)
+    {
+      this.evaluateStartState();
+    }
+
+    //Change label for accepts if the label for it changed...
+    if (node.accept)
+    {
+      this.evaluateFinalStates();
+    }
+
+    //Compute states
+    this.evaluateStates();
+
+    //Compute transitions
+    this.evaluateTransitions();
+  }
+
+  onEdge(edge)
+  {
+    //Compute symbols
+    this.evaluateSymbols();
+
+    //Compute transitions
+    this.evaluateTransitions();
+  }
+
+  onEdgeDestination(edge, newDestination, oldDestination)
+  {
+    //Compute transitions
+    this.evaluateTransitions();
+  }
+
+  onNewInitial(node)
+  {
+    //Compute initial state
+    this.evaluateStartState();
+  }
+
+  onToggleAccept(node)
+  {
+    //Compute final states
+    this.evaluateFinalStates();
   }
 
   parse()
