@@ -2,6 +2,9 @@ import MainCursorController from 'controller/cursor/MainCursorController.js';
 import MainButtonController from 'controller/button/MainButtonController.js';
 import GraphParser from 'parser/GraphParser.js';
 
+import DFA from 'tester/DFA.js';
+import NFA from 'tester/NFA.js';
+
 class GraphController
 {
   constructor(canvas, graph, mouse)
@@ -16,6 +19,20 @@ class GraphController
     this.parser = new GraphParser(this.graph);
 
     this.mode = new ModeNFA(this);
+
+    //TODO: Tester does not work with symbols greater than one character!
+    const inputTest = document.getElementById("test_input")
+    const buttonTest = document.getElementById("test_execute");
+    buttonTest.addEventListener('click', (event) => {
+      alert(this.test((inputTest.value || "")[Symbol.iterator]()) ? "SUCCESS!" : "FAILED!");
+      inputTest.value = "";
+    });
+    inputTest.addEventListener('keyup', (e) => {
+      if (e.keyCode == SUBMIT_KEY)
+      {
+        buttonTest.click();
+      }
+    });
   }
 
   initialize()
@@ -24,6 +41,33 @@ class GraphController
     this.buttons.load();
 
     this.mode.activate();
+  }
+
+  test(input)
+  {
+    const transitions = [];
+    for(const edge of this.graph.edges)
+    {
+      for(const label of edge.label.split(" "))
+      {
+        let transition = [];
+        transition.push(edge.from.label);
+        transition.push(label);
+        transition.push(edge.to ? edge.to.label : "undefined");
+        transitions.push(transition);
+      }
+    }
+    const start = this.graph.getInitialState().label;
+    const finals = [];
+    for(const node of this.graph.nodes)
+    {
+      if (node.accept)
+      {
+        finals.push(node.label);
+      }
+    }
+    const tester = new NFA(transitions, start, finals);
+    return tester.solve(input);
   }
 
   update(dt)

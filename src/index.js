@@ -41,7 +41,7 @@ function onCanvasLoad()
   node = graph.createNewNode(-64, 0, "q0");
   node2 = graph.createNewNode(64, 0, "q1");
   node2.accept = true;
-  edge = graph.createNewEdge(node, node2, "abc 0");
+  edge = graph.createNewEdge(node, node2, "0 1");
   //END OF DEBUG CODE
 
   controller.initialize();

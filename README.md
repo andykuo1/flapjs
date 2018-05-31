@@ -20,19 +20,16 @@ To make a program that is more accessible and intuitive to use, so we can become
   - [x] Deterministic Finite Automaton
   - [x] Nondeterministic Finite Automaton
   - [ ] Pushdown Automaton
-  - [ ] Context-Free Grammar
   - [ ] Turing Machine
 - Machine Testing:
   - [x] Deterministic Finite Automaton
   - [x] Nondeterministic Finite Automaton
   - [ ] Pushdown Automaton
-  - [ ] Context-Free Grammar
   - [ ] Turing Machine
 - Formal Definition Summary:
   - [x] Deterministic Finite Automaton
   - [x] Nondeterministic Finite Automaton
   - [ ] Pushdown Automaton
-  - [ ] Context-Free Grammar
   - [ ] Turing Machine
 ---
 

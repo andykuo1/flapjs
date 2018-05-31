@@ -1,5 +1,5 @@
 
-//node --experimental-modules ./src/DFA.mjs
+//node --experimental-modules ./src/tester/Test.mjs
 
 let machine;
 
@@ -16,8 +16,6 @@ test("1", machine);
 test("011111", machine);
 test("11010101", machine);
 test("1111", machine);
-
-//node --experimental-modules ./src/NFA.mjs
 
 console.log("Machine 1");
 machine = new NFA(

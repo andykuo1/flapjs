@@ -1,6 +1,6 @@
 const EMPTY_STRING = '#';
 
-export class NFA
+class NFA
 {
   constructor(transitions, startState, finalStates)
   {
@@ -79,3 +79,5 @@ export class NFA
     return false;
   }
 }
+
+export default NFA;
