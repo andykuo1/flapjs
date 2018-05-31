@@ -16,21 +16,49 @@ To make a program that is more accessible and intuitive to use, so we can become
 
 ## Features
 ### 1.0.0
-- Graph Representation:
-  - [x] Deterministic Finite Automaton
-  - [x] Nondeterministic Finite Automaton
-  - [ ] Pushdown Automaton
-  - [ ] Turing Machine
-- Machine Testing:
-  - [x] Deterministic Finite Automaton
-  - [x] Nondeterministic Finite Automaton
-  - [ ] Pushdown Automaton
-  - [ ] Turing Machine
-- Formal Definition Summary:
-  - [x] Deterministic Finite Automaton
-  - [x] Nondeterministic Finite Automaton
-  - [ ] Pushdown Automaton
-  - [ ] Turing Machine
+- [x] Deterministic Finite Automaton
+- [x] Nondeterministic Finite Automaton
+- [ ] Pushdown Automaton
+- [ ] Turing Machine
+- [x] Nodal Graphing
+  - [x] Basic layout
+  - [x] Component creation
+  - [x] Component deletion
+  - [x] Edge redirection
+  - [x] Label editing
+- [~] Formal Definition summary
+  - [x] States
+  - [x] Symbols
+  - [x] Transitions
+  - [x] Start State
+  - [x] Final States
+  - [ ] Tape Symbols
+  - [ ] q_acc
+  - [ ] q_rej
+- [~] String testing
+  - [~] DFA
+  - [x] NFA
+- [ ] Tape testing
+  - [ ] PDA
+  - [ ] TM
+- [x] Export to image
+
+### Future Development
+- Additional features:
+  - [ ] Keyboard navigation
+  - [ ] Drag-n-drop?
+  - [ ] Save / Load from file
+  - [ ] Formal Definition editing
+  - [ ] Autosaving
+  - [ ] Auto layout
+- Possible features:
+  - [ ] Export to JFLAP
+  - [ ] Single string parsing
+  - [ ] Regular Expressions
+  - [ ] Context-Free Grammars
+  - [ ] Machine conversions, unions, intersections, etc.
+  - [ ] Peer to peer collaboration
+
 ---
 
 ## Setting up the workspace
