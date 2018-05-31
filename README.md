@@ -159,5 +159,219 @@ This will run all appropriate commands to bundle and build the program, then wil
 ---
 
 ## Design notes
+
+### Deterministic Finite Automaton
+	DFA = {Q, SIGMA, DELTA, q0, F}
+
+### Nondeterministic Finite Automaton
+	NFA = {Q, SIGMA, DELTA, q0, F} (where empty string is a symbol)
+
+### Pushdown Automaton
+	PDA = {Q, SIGMA, GAMMA, DELTA, q0, F}
+
+### Turing Machines
+	TM = {Q, SIGMA, GAMMA, DELTA, q0, q_acc, q_rej}
+
+### Regular Expressions
+	REGEX = { EXPRESSIONS }
+
+### Context-Free Grammars
+	CFG = {V, SIGMA, R, A, S}
+
+---
+
+## Design Problems
+Should touch-screens be supported? If so, how should the controls work?
+
+More specifically, moving states and creating edges currently both use dragging, but one is for each button on the mouse. For touch, however, this would be the same action. What is the solution?
+
+> Answer: Maybe a separate on-screen “move” button, where one can hold that button to move objects. Normal input behavior is then ignored until button is released. Can also be toggled, if tapped.
+However, this is only the case if on mobile. Otherwise, right-clicks are considered to be “move” inputs when on computers.
+
+Also, keyboards are annoying on phones. How can we minimize that?
+
+> Possible Answer: Drag-and-drop predefined constants? Like 0, 1, EMPTY?
+
+Also also, Turing Machines should automatically create q_acc and q_rej. However, this is problem for keyboard-users, since there is not a way to easily connect two existing states. (Right now, it connects an existing state to a new one.) How should this be implemented efficiently and intuitively?
+
+Thirdly, formal definitions should reflect the graph’s contents. Should it also be editable and generate a graph from the changes?
+
+The program should also autosave the previous graph, regardless if the person explicitly saves it. Should be able to be saved to cookies. This option should also be toggleable.
+
+The program should also be able to export to JFLAP.
+
+The program should also be able to export to image file.
+
+The program should also be able to save / load graphs.
+
+---
+
+## Design Solutions
+
+### **Nodal Graphing (Mouse only / Keyboard only)**
+### *(Non) Deterministic Finite Automaton*
+#### DFA = {Q, SIGMA, DELTA, q0, F}
+##### Q: (Single-Click) to create state.
+
+[key=SPACE] to create state, connected to current state, then move to that state.
+
+[key=SHIFT-SPACE] to create state, connected to current state, then not move.
+
+[key=CTRL-SPACE] to create state, with no connections, then move to that state.
+
+[key=HOME / END] to move to start or cycle final states.
+
+[key=LEFT / RIGHT / UP / DOWN] to move to start if none selected, or move to left / right / up / down nearest state. If none found, move to nearest state.
+
+[key=SHIFT-LEFT / SHIFT-RIGHT / SHIFT-UP / SHIFT-DOWN] to select left / right / up / down connected state, then continue to cycle through connected states. When release [SHIFT], cursor will move to that state.
+
+To delete state:
+
+(Click-Drag: “move”) the state to TRASH CAN.
+
+[key=DELETE] to delete current state.
+
+(Src edges will be deleted, but dst edges return.)
+
+To move the state around:
+
+(Click-Drag: “move”) the state.
+
+(If on mobile: “move” inputs are ignored unless MOVESTATE is active. There should be a button that can be toggled on tap, or held down to activate MOVESTATE. This should resolve the conflict with creating edges.)
+
+(If DFA: Every state should already have edges for every SIGMA)
+
+(If DFA: Should create with initial values of 0)
+
+(If NFA: Should create with initial values as EMPTY_STRING)
+
+##### SIGMA: Implied from DELTA.
+
+(If NFA: empty string is also a symbol)
+
+##### DELTA: (Click-Drag) to create edge.
+
+To change read symbol:
+
+(Single-Click) center, then it will open a text field.
+
+[key=TAB] to cycle through labels from current state
+
+To change the destination:
+
+(Click-Drag) endpoint to state.
+
+To delete edge:
+
+(Click-Drag) endpoint to empty space.
+
+[key=DELETE] to delete current edge.
+
+(If DFA: you cannot delete; it will just return to src state)
+
+To bend arrow:
+
+(Click-Drag: “move”) center
+
+##### q0: Implied. The first state created.
+
+##### F: (Single-Click) on state to toggle as final state.
+
+### *Pushdown Automaton*
+#### PDA = {Q, SIGMA, GAMMA, DELTA, q0, F}
+##### Q: Same as DFA.
+
+(Should create with initial values as EMPTY_STRING)
+
+##### SIGMA: Same as DFA.
+
+##### GAMMA: Implied from DELTA.
+
+##### DELTA: Same as DFA.
+
+To change read symbol: Same as DFA.
+
+To change pop symbol: Same as DFA for read symbols.
+
+To change push symbol: Same as DFA for read symbols.
+
+[key=SPACE] while editing label to goto next symbol.
+
+##### q0: Same as DFA.
+
+##### F: Same as DFA.
+
+### *Turing Machines*
+#### TM = {Q, SIGMA, GAMMA, DELTA, q0, q_acc, q_rej}
+##### Q: Same as DFA.
+
+(Should create with initial values as EMPTY_STRING)
+
+##### SIGMA: Same as DFA.
+
+##### GAMMA: Same as PDA.
+
+##### DELTA: Same as DFA.
+
+To change read symbol: Same as DFA.
+
+To change write symbol: Same as DFA for read symbols.
+
+To change move symbol: Same as DFA for read symbols.
+
+(this should be automatically capitalized)
+
+[key=SPACE] while editing label to goto next symbol.
+
+##### q0: Same as DFA.
+
+##### q_acc: Implied. Created at beginning, not connected to anything.
+
+??? (How to connect q_acc by keyboard?)
+
+##### q_rej: Implied. Created at beginning.
+
+(Can be toggled in options, whether to be visible)
+
+(Can be toggled in options, whether to automatically connect all unspecified states to q_rej, as by convention)
+
+## **Formal Definition (Keyboard only)**
+### *Deterministic Finite Automaton*
+#### DFA = {Q, SIGMA, DELTA, q0, F}
+
+Nothing so far.
+
+### Nondeterministic Finite Automaton
+#### NFA = {Q, SIGMA, DELTA, q0, F} (where empty string is a symbol)
+
+Nothing so far.
+
+### Pushdown Automaton
+#### PDA = {Q, SIGMA, GAMMA, DELTA, q0, F}
+
+Nothing so far.
+
+### Turing Machines
+#### TM = {Q, SIGMA, GAMMA, DELTA, q0, q_acc, q_rej}
+
+Nothing so far.
+
+## String Parsing (Keyboard only)
+
+Nothing so far.
+
+## String Testing / Tape Testing
+
+Input field and then run the string on the current graph.
+
+## Auto-Layout
+
+Progression-Based Horizontal / Vertical
+Circular
+Outward
+Scatter
+
+
+## Other Notes
 Should dragging be allowed to exit and re-enter the canvas? Or should everything be cancelled on exit?
 3v - 6 >= e
