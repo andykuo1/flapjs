@@ -1,4 +1,4 @@
-import NodalGraphSorter from 'NodalGraphSorter.js';
+import GraphSorter from 'GraphSorter.js';
 
 class MainButtonController
 {
@@ -26,7 +26,7 @@ class MainButtonController
     const buttonSimulatePhysics = document.getElementById("simulate_physics");
     buttonSimulatePhysics.addEventListener('click', (event) => {
       //Begin to simulate physics for graph...
-      NodalGraphSorter.sort();
+      GraphSorter.sort();
     });
     const buttonExportImage = document.getElementById("export_image");
     buttonExportImage.addEventListener('click', (event) => {
@@ -38,7 +38,7 @@ class MainButtonController
 
   update(dt)
   {
-    NodalGraphSorter.update(dt, this.graph);
+    GraphSorter.update(dt, this.graph);
   }
 }
 

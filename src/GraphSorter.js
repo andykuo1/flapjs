@@ -1,4 +1,4 @@
-class NodalGraphSorter
+class GraphSorter
 {
   constructor()
   {
@@ -36,4 +36,4 @@ class NodalGraphSorter
   }
 }
 
-export default new NodalGraphSorter();
+export default new GraphSorter();
