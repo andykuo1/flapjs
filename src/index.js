@@ -24,18 +24,12 @@ function onAnimationFrame(time)
 }
 
 //Setup application
-import NodalGraphRenderer from 'NodalGraphRenderer.js';
-import GraphParser from 'parser/GraphParser.js';
-
-import MainCursorController from 'controller/cursor/MainCursorController.js';
-import MainButtonController from 'controller/button/MainButtonController.js';
-
 import { NodalGraph } from 'NodalGraph.js';
+import GraphController from 'controller/GraphController.js';
+import GraphRenderer from 'GraphRenderer.js';
 
 const graph = new NodalGraph(canvas);
-const parser = new GraphParser(graph);
-const cursorController = new MainCursorController(graph, mouse);
-const buttonController = new MainButtonController(canvas, graph, cursorController);
+const controller = new GraphController(canvas, graph, mouse);
 
 function onCanvasLoad()
 {
@@ -50,8 +44,7 @@ function onCanvasLoad()
   edge = graph.createNewEdge(node, node2, "abc 0");
   //END OF DEBUG CODE
 
-  cursorController.load();
-  buttonController.load();
+  controller.initialize();
 }
 
 let avgFramesPerSecond = 60;
@@ -61,12 +54,10 @@ function onCanvasDraw(ctx, time)
   const dt = (time - prevTime) / avgFramesPerSecond;
 
   graph.update(dt);
-  cursorController.update(dt);
-  buttonController.update(dt);
-  parser.parse(graph);
+  controller.update(dt);
 
-  NodalGraphRenderer.render(ctx, dt, graph);
-  cursorController.draw(ctx);
+  GraphRenderer.render(ctx, dt, graph);
+  controller.render(ctx);
 
   prevTime = time;
 }

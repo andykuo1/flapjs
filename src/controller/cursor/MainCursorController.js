@@ -1,6 +1,6 @@
 import LabelEditor from 'controller/LabelEditor.js';
 import GraphCursor from 'controller/GraphCursor.js';
-import NodalGraphRenderer from 'NodalGraphRenderer.js';
+import GraphRenderer from 'GraphRenderer.js';
 
 import EditCursorController from 'controller/cursor/EditCursorController.js';
 import MoveCursorController from 'controller/cursor/MoveCursorController.js';
@@ -188,7 +188,7 @@ class MainCursorController
           x = x;
           y = y;
       }
-      NodalGraphRenderer.drawHoverCircle(ctx, x, y, r + HOVER_RADIUS_OFFSET);
+      GraphRenderer.drawHoverCircle(ctx, x, y, r + HOVER_RADIUS_OFFSET);
     }
   }
 

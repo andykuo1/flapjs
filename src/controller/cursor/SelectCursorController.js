@@ -1,5 +1,5 @@
 import CursorController from 'controller/cursor/CursorController.js';
-import NodalGraphRenderer from 'NodalGraphRenderer.js';
+import GraphRenderer from 'GraphRenderer.js';
 
 class SelectCursorController extends CursorController
 {
@@ -81,7 +81,7 @@ class SelectCursorController extends CursorController
     {
       for(const target of this.selectBox.targets)
       {
-        NodalGraphRenderer.drawHoverCircle(ctx, target.x, target.y, NODE_RADIUS + HOVER_RADIUS_OFFSET);
+        GraphRenderer.drawHoverCircle(ctx, target.x, target.y, NODE_RADIUS + HOVER_RADIUS_OFFSET);
       }
     }
   }

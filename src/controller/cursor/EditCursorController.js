@@ -1,5 +1,4 @@
 import CursorController from 'controller/cursor/CursorController.js';
-import NodalGraphRenderer from 'NodalGraphRenderer.js';
 
 class EditCursorController extends CursorController
 {

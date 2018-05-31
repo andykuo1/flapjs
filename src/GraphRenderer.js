@@ -1,6 +1,6 @@
 import { Node } from 'NodalGraph.js';
 
-class NodalGraphRenderer
+class GraphRenderer
 {
   constructor()
   {
@@ -218,4 +218,4 @@ function drawInitialMarker(ctx, initialNode)
   ctx.stroke();
 }
 
-export default new NodalGraphRenderer();
+export default new GraphRenderer();
