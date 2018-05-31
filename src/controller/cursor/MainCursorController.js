@@ -83,7 +83,7 @@ class MainCursorController
     this.target = null;
     this.targetType = null;
 
-    this.shouldDestroyPointlessEdges = false;
+    this.shouldDestroyPointlessEdges = DEFAULT_SHOULD_DESTROY_POINTLESS_EDGE;
     //TODO: Trash area should NOT show up on exported image!
     this.trashArea = { x: TRASH_AREA_POSX, y: TRASH_AREA_POSY,
                         width: TRASH_AREA_WIDTH, height: TRASH_AREA_HEIGHT };

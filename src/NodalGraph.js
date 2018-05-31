@@ -343,6 +343,7 @@ export class Edge
       get x() { return this.from.x + PLACEHOLDER_LENGTH * this.dx; },
       get y() { return this.from.y + PLACEHOLDER_LENGTH * this.dy; }
     };
+    this.quad = null;
   }
 
   isSelfLoop()

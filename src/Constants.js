@@ -34,6 +34,7 @@ const SELF_LOOP_HEIGHT = 32;
 //Interface
 const DOUBLE_TAP_TICKS = 20;
 const SPAWN_RADIUS = 64;
+const DEFAULT_SHOULD_DESTROY_POINTLESS_EDGE = true;
 
 //Graph sorting
 const PADDING_RADIUS_SQU = 2304;
