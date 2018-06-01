@@ -75,11 +75,6 @@ class GraphController
     this.cursors.update(dt);
     this.buttons.update(dt);
   }
-
-  render(ctx)
-  {
-    this.cursors.draw(ctx);
-  }
 }
 
 class ModeDFA

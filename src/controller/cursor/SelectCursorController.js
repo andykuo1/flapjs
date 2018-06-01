@@ -1,5 +1,4 @@
 import CursorController from 'controller/cursor/CursorController.js';
-import GraphRenderer from 'GraphRenderer.js';
 
 class SelectCursorController extends CursorController
 {
@@ -55,35 +54,6 @@ class SelectCursorController extends CursorController
     }
 
     return false;
-  }
-
-  draw(ctx)
-  {
-    if (this.isSelecting)
-    {
-      const dx = this.selectBox.mx - this.selectBox.x;
-      const dy = this.selectBox.my - this.selectBox.y;
-      ctx.save();
-      {
-        ctx.shadowColor = SELECTION_BOX_SHADOW_COLOR;
-        ctx.shadowBlur = SELECTION_BOX_SHADOW_SIZE;
-        ctx.shadowOffsetX = SELECTION_BOX_SHADOW_OFFSETX;
-        ctx.shadowOffsetY = SELECTION_BOX_SHADOW_OFFSETY;
-        ctx.fillStyle = SELECTION_BOX_FILL_STYLE;
-        ctx.strokeStyle = SELECTION_BOX_STROKE_STYLE;
-        ctx.fillRect(this.selectBox.x, this.selectBox.y, dx, dy);
-        ctx.strokeRect(this.selectBox.x, this.selectBox.y, dx, dy);
-      }
-      ctx.restore();
-    }
-
-    if (this.hasSelection())
-    {
-      for(const target of this.selectBox.targets)
-      {
-        GraphRenderer.drawHoverCircle(ctx, target.x, target.y, NODE_RADIUS + HOVER_RADIUS_OFFSET);
-      }
-    }
   }
 
   getSelection(cursor)

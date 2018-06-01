@@ -1,6 +1,5 @@
 import LabelEditor from 'controller/LabelEditor.js';
 import GraphCursor from 'controller/GraphCursor.js';
-import GraphRenderer from 'GraphRenderer.js';
 
 import EditCursorController from 'controller/cursor/EditCursorController.js';
 import MoveCursorController from 'controller/cursor/MoveCursorController.js';
@@ -83,6 +82,9 @@ class MainCursorController
     this.target = null;
     this.targetType = null;
 
+    this.hoverTarget = null;
+    this.hoverType = null;
+
     this.shouldDestroyPointlessEdges = DEFAULT_SHOULD_DESTROY_POINTLESS_EDGE;
     //TODO: Trash area should NOT show up on exported image!
     this.trashArea = { x: TRASH_AREA_POSX, y: TRASH_AREA_POSY,
@@ -103,92 +105,28 @@ class MainCursorController
     {
       --this.doubleTapTicks;
     }
-  }
 
-  draw(ctx)
-  {
-    const mx = this.mouse.x;
-    const my = this.mouse.y;
+    const x = this.mouse.x;
+    const y = this.mouse.y;
 
-    this.selectCursor.draw(ctx);
-
-    this.drawTrashArea(ctx);
-    this.drawHoverInformation(ctx, mx, my);
-  }
-
-  drawTrashArea(ctx)
-  {
-    ctx.save();
+    //Get hover target
+    this.hoverTarget = null;
+    if (this.hoverTarget = this.target)
     {
-      ctx.shadowColor = TRASH_AREA_SHADOW_COLOR;
-      ctx.shadowBlur = TRASH_AREA_SHADOW_SIZE;
-      ctx.shadowOffsetX = TRASH_AREA_SHADOW_OFFSETX;
-      ctx.shadowOffsetY = TRASH_AREA_SHADOW_OFFSETY;
-      ctx.fillStyle = TRASH_AREA_FILL_STYLE;
-      ctx.strokeStyle = TRASH_AREA_STROKE_STYLE;
-      ctx.fillRect(this.trashArea.x, this.trashArea.y, this.trashArea.width, this.trashArea.height);
-      ctx.strokeRect(this.trashArea.x, this.trashArea.y, this.trashArea.width, this.trashArea.height);
+      this.hoverTarget = this.target;
+      this.hoverType = this.targetType;
     }
-    ctx.restore();
-  }
-
-  drawHoverInformation(ctx, x, y)
-  {
-    let selectTarget = null;
-    let selectType = null;
-
-    if (selectTarget = this.target)
+    else if (this.hoverTarget = this.cursor.getNodeAt(x, y))
     {
-      selectTarget = this.target;
-      selectType = this.targetType;
+      this.hoverType = "node";
     }
-    else if (selectTarget = this.cursor.getNodeAt(x, y))
+    else if (this.hoverTarget = this.cursor.getEdgeAt(x, y))
     {
-      selectType = "node";
+      this.hoverType = "edge";
     }
-    else if (selectTarget = this.cursor.getEdgeAt(x, y))
+    else if (this.hoverTarget = this.cursor.getEdgeByEndPointAt(x, y))
     {
-      selectType = "edge";
-    }
-    else if (selectTarget = this.cursor.getEdgeByEndPointAt(x, y))
-    {
-      selectType = "endpoint";
-    }
-
-    if (selectTarget != null)
-    {
-      //Don't draw hover info for already selected targets...
-      if (this.selectCursor.selectBox.targets.includes(selectTarget))
-      {
-        return;
-      }
-
-      let x = 0;
-      let y = 0;
-      let r = CURSOR_RADIUS;
-      switch(selectType)
-      {
-        case "node":
-          x = selectTarget.x;
-          y = selectTarget.y;
-          r = NODE_RADIUS;
-          break;
-        case "edge":
-          x = selectTarget.x;
-          y = selectTarget.y;
-          r = EDGE_RADIUS;
-          break;
-        case "endpoint":
-          const endpoint = selectTarget.getEndPoint();
-          x = endpoint[0];
-          y = endpoint[1];
-          r = ENDPOINT_RADIUS;
-          break;
-        default:
-          x = x;
-          y = y;
-      }
-      GraphRenderer.drawHoverCircle(ctx, x, y, r + HOVER_RADIUS_OFFSET);
+      this.hoverType = "endpoint";
     }
   }
 
