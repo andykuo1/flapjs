@@ -7,14 +7,14 @@ import NFA from 'tester/NFA.js';
 
 class GraphController
 {
-  constructor(canvas, graph, mouse)
+  constructor(viewport, graph, mouse)
   {
     this.graph = graph;
     this.mouse = mouse;
-    this.canvas = canvas;
+    this.viewport = viewport;
 
     this.cursors = new MainCursorController(this.graph, this.mouse);
-    this.buttons = new MainButtonController(this.canvas, this.graph, this.cursors);
+    this.buttons = new MainButtonController(this.viewport, this.graph, this.cursors);
 
     this.parser = new GraphParser(this.graph);
 

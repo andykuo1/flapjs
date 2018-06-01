@@ -11,20 +11,20 @@ import Eventable from 'util/Eventable.js';
 //newInitial(node, oldNode) - Whenever a node becomes the initial state; oldNode could be null
 export class NodalGraph
 {
-  constructor(canvas)
+  constructor(viewport)
   {
     this.nodes = [];
     this.edges = [];
 
-    this.canvas = canvas;
+    this.viewport = viewport;
     this._offsetX = 0;
     this._offsetY = 0;
     this.nextOffsetX = 0;
     this.nextOffsetY = 0;
   }
 
-  get centerX() { return this.canvas.width / 2 + this._offsetX; }
-  get centerY() { return this.canvas.height / 2 + this._offsetY; }
+  get centerX() { return this.viewport.width / 2 + this._offsetX; }
+  get centerY() { return this.viewport.height / 2 + this._offsetY; }
 
   get offsetX() { return this._offsetX; }
   get offsetY() { return this._offsetY; }

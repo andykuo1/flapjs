@@ -2,9 +2,9 @@ import GraphSorter from 'GraphSorter.js';
 
 class MainButtonController
 {
-  constructor(canvas, graph, cursorController)
+  constructor(viewport, graph, cursorController)
   {
-    this.canvas = canvas;
+    this.viewport = viewport;
     this.graph = graph;
 
     this.cursorController = cursorController;
@@ -30,9 +30,12 @@ class MainButtonController
     });
     const buttonExportImage = document.getElementById("export_image");
     buttonExportImage.addEventListener('click', (event) => {
-      //Export canvas to png image
-      const dataURL = this.canvas.toDataURL("image/png");
-      download(dataURL, EXPORT_FILE_NAME, "image/png");
+      if (this.viewport instanceof HTMLImageElement)
+      {
+        //Export canvas to png image
+        const dataURL = this.viewport.toDataURL("image/png");
+        download(dataURL, EXPORT_FILE_NAME, "image/png");
+      }
     });
   }
 

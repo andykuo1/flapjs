@@ -15,17 +15,17 @@ class Mouse
    * constructor - Creates and registers this with the element to listen for
    * mouse events
    *
-   * @param {type} canvas  The canvas to calculate appropriate mouse position
+   * @param {type} viewport The viewport to calculate appropriate mouse position
    * @param {type} element The element to listen for mouse events
    */
-  constructor(canvas, element)
+  constructor(viewport, element)
   {
     this.x = 0;
     this.y = 0;
     this.scrollX = 0;
     this.scrollY = 0;
 
-    this._canvas = canvas;
+    this._viewport = viewport;
     this._element = element;
 
     this._mouseup = this.onMouseUp.bind(this);
@@ -49,28 +49,28 @@ class Mouse
       return true;
     };
 
-    this._element.addEventListener('contextmenu', this._contextmenu, false);
-    this._element.addEventListener('mouseup', this._mouseup);
-    this._element.addEventListener('mousedown', this._mousedown);
-    this._element.addEventListener('click', this._mouseclick);
-    this._element.addEventListener('wheel', this._wheel);
+    this._viewport.addEventListener('contextmenu', this._contextmenu, false);
+    this._viewport.addEventListener('mouseup', this._mouseup);
+    this._viewport.addEventListener('mousedown', this._mousedown);
+    this._viewport.addEventListener('click', this._mouseclick);
+    this._viewport.addEventListener('wheel', this._wheel);
     this._element.addEventListener('mousemove', this._mousemove);
-    this._element.addEventListener('mouseenter', this._mouseenter);
-    this._element.addEventListener('mouseleave', this._mouseexit);
-    this._element.addEventListener('touchstart', this._touchstart);
+    this._viewport.addEventListener('mouseenter', this._mouseenter);
+    this._viewport.addEventListener('mouseleave', this._mouseexit);
+    this._viewport.addEventListener('touchstart', this._touchstart);
   }
 
   destroy()
   {
-    this._element.removeEventListener('contextmenu', this._contextmenu);
-    this._element.removeEventListener('mouseup', this._mouseup);
-    this._element.removeEventListener('mousedown', this._mousedown);
-    this._element.removeEventListener('click', this._mouseclick);
-    this._element.removeEventListener('wheel', this._wheel);
+    this._viewport.removeEventListener('contextmenu', this._contextmenu);
+    this._viewport.removeEventListener('mouseup', this._mouseup);
+    this._viewport.removeEventListener('mousedown', this._mousedown);
+    this._viewport.removeEventListener('click', this._mouseclick);
+    this._viewport.removeEventListener('wheel', this._wheel);
     this._element.removeEventListener('mousemove', this._mousemove);
-    this._element.removeEventListener('mouseenter', this._mouseenter);
-    this._element.removeEventListener('mouseleave', this._mouseexit);
-    this._element.removeEventListener('touchstart', this._touchstart);
+    this._viewport.removeEventListener('mouseenter', this._mouseenter);
+    this._viewport.removeEventListener('mouseleave', this._mouseexit);
+    this._viewport.removeEventListener('touchstart', this._touchstart);
   }
 
   onMouseUp(event)
@@ -100,7 +100,7 @@ class Mouse
 
   onMouseMove(event)
   {
-    const screen = this._canvas.getBoundingClientRect();
+    const screen = this._viewport.getBoundingClientRect();
     this.x = event.clientX - screen.left;
     this.y = event.clientY - screen.top;
     this.emit('mousemove', this, this.x, this.y);

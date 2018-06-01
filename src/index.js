@@ -1,39 +1,36 @@
 import Mouse from 'util/Mouse.js';
+const viewport = document.getElementById("canvas");
+const ctx = viewport.getContext("2d");
+const mouse = new Mouse(viewport, document);//Or viewport
+const fps = 60.0;
 
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
-const mouse = new Mouse(canvas, canvas);
+//Setup viewport
+window.addEventListener('load', (event) => {
+  //For canvas only...
+  viewport.width = window.innerWidth;
+  viewport.height = window.innerHeight;
 
-//Setup canvas
-window.addEventListener('load', onWindowResize);
-window.addEventListener('resize', onWindowResize);
-function onWindowResize(event)
-{
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
+  loadApplication();
+  window.requestAnimationFrame(updateApplication);
+});
 
-//Setup render loop
-window.onload = onCanvasLoad;
-window.requestAnimationFrame(onAnimationFrame);
-function onAnimationFrame(time)
-{
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  onCanvasDraw(ctx, time);
-  window.requestAnimationFrame(onAnimationFrame);
-}
+//For canvas only...
+window.addEventListener('resize', (event) => {
+  viewport.width = window.innerWidth;
+  viewport.height = window.innerHeight;
+});
 
 //Setup application
 import { NodalGraph } from 'NodalGraph.js';
 import GraphController from 'controller/GraphController.js';
 import CanvasRenderer from 'renderer/CanvasRenderer.js';
 
-const graph = new NodalGraph(canvas);
-const controller = new GraphController(canvas, graph, mouse);
+const graph = new NodalGraph(viewport);//Or viewport
+const controller = new GraphController(viewport, graph, mouse);//Or viewport
 
-const canvasRenderer = new CanvasRenderer(ctx, canvas, graph, controller);
+const canvasRenderer = new CanvasRenderer(ctx, viewport, graph, controller);
 
-function onCanvasLoad()
+function loadApplication()
 {
   //DEBUG: For testing...
   let node = null;
@@ -49,16 +46,16 @@ function onCanvasLoad()
   controller.initialize();
 }
 
-let avgFramesPerSecond = 60;
-let prevTime = 0;
-function onCanvasDraw(ctx, time)
+let prevtime = 0;
+function updateApplication(time)
 {
-  const dt = (time - prevTime) / avgFramesPerSecond;
-
-  graph.update(dt);
-  controller.update(dt);
-
-  canvasRenderer.render(ctx);
-
-  prevTime = time;
+  const dt = (time - prevtime) / fps;
+  {
+    ctx.clearRect(0, 0, viewport.width, viewport.height);
+    graph.update(dt);
+    controller.update(dt);
+    canvasRenderer.render(ctx);
+  }
+  prevtime = time;
+  window.requestAnimationFrame(updateApplication);
 }
