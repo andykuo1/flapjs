@@ -17,6 +17,10 @@ class ReactRenderer
     this.controller = controller;
     this.root = document.getElementById("root");
 
+    //TODO: Unable to export to png for svg...
+    const buttonExportImage = document.getElementById("export_image");
+    buttonExportImage.disabled = true;
+
     /*
     this.nodeElements = new Map();
     this.edgeElements = new Map();
