@@ -6,6 +6,15 @@ class ReactRenderer
 {
   constructor()
   {
-    
+
+  }
+
+  render()
+  {
+    //Render the app in <div id="root"></div>
+    ReactDOM.render(
+      <App />,
+      document.getElementById('root')
+    );
   }
 }
