@@ -22,11 +22,12 @@ window.addEventListener('resize', (event) => {
 import { NodalGraph } from 'NodalGraph.js';
 import GraphController from 'controller/GraphController.js';
 import CanvasRenderer from 'renderer/CanvasRenderer.js';
+import ReactRenderer from 'renderer/ReactRenderer.js';
 
 const graph = new NodalGraph(viewport);
 const controller = new GraphController(viewport, graph, mouse);
 
-const canvasRenderer = new CanvasRenderer(viewport, graph, controller);
+const renderer = new ReactRenderer(viewport, graph, controller);
 
 function loadApplication()
 {
@@ -51,7 +52,8 @@ function updateApplication(time)
   {
     graph.update(dt);
     controller.update(dt);
-    canvasRenderer.render();
+
+    renderer.render();
   }
   prevtime = time;
   window.requestAnimationFrame(updateApplication);

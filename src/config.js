@@ -50,12 +50,14 @@ export const GRAPH_INFO_COLOR = "lightgray";
 //Styling
 export const NODE_FONT = "12px Arial";
 export const NODE_TEXT_ALIGN = "center";
+export const NODE_TEXT_ANCHOR = "middle";
 export const NODE_STROKE_STYLE = STATE_LINE_COLOR;
 export const NODE_FILL_STYLE = STATE_BASE_COLOR;
 export const NODE_TEXT_FILL_STYLE = STATE_TEXT_COLOR;
 
 export const EDGE_FONT = "12px Arial";
 export const EDGE_TEXT_ALIGN = "center";
+export const EDGE_TEXT_ANCHOR = "middle";
 export const EDGE_STROKE_STYLE = TRANSITION_COLOR;
 export const EDGE_TEXT_STROKE_STYLE = TRANSITION_TEXT_COLOR;
 

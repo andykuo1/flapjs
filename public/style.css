@@ -14,7 +14,7 @@ header, footer {
   height: 60px;
   z-index: 2;
 }
-canvas {
+#workspace {
   position: absolute;
   z-index: 0;
   top: 0;
@@ -25,6 +25,11 @@ canvas {
   user-select: none;
   -webkit-user-select: none;
 }
+canvas, svg {
+  width: 100%;
+  height: 100%;
+}
+
 .content {
   display: flex;
   flex: 1;

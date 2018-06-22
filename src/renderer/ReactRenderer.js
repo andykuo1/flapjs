@@ -2,7 +2,8 @@ import { Node } from 'NodalGraph.js';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from 'App.js';
+
+import App from 'app/App.js';
 
 import * as Config from 'config.js';
 
@@ -16,8 +17,6 @@ class ReactRenderer
     this.controller = controller;
     this.root = document.getElementById("root");
 
-    this.app = new App();
-    
     /*
     this.nodeElements = new Map();
     this.edgeElements = new Map();
@@ -62,7 +61,7 @@ class ReactRenderer
   render()
   {
     //Render the app in <div id="root"></div>
-    ReactDOM.render(this.app, this.root);
+    ReactDOM.render(React.createElement(App, {graph: this.graph, controller: this.controller}, null), this.root);
 
     /*
     const ctx = this.ctx;
