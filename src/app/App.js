@@ -1,6 +1,5 @@
 import React from 'react';
 import { hot } from 'react-hot-loader';
-import 'app/App.css';
 
 import { Node } from 'NodalGraph.js';
 
