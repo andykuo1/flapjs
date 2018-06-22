@@ -1,21 +1,18 @@
 import Mouse from 'util/Mouse.js';
 import * as Config from 'config.js';
 
-const viewport = document.getElementById("canvas");
-const mouse = new Mouse(viewport, document);//Or viewport
+const viewport = document.getElementById("workspace");
+const mouse = new Mouse(viewport, document);
 const fps = 60.0;
 
 //Setup viewport
 window.addEventListener('load', (event) => {
-  //For canvas only...
   viewport.width = window.innerWidth;
   viewport.height = window.innerHeight;
 
   loadApplication();
   window.requestAnimationFrame(updateApplication);
 });
-
-//For canvas only...
 window.addEventListener('resize', (event) => {
   viewport.width = window.innerWidth;
   viewport.height = window.innerHeight;
@@ -26,8 +23,8 @@ import { NodalGraph } from 'NodalGraph.js';
 import GraphController from 'controller/GraphController.js';
 import CanvasRenderer from 'renderer/CanvasRenderer.js';
 
-const graph = new NodalGraph(viewport);//Or viewport
-const controller = new GraphController(viewport, graph, mouse);//Or viewport
+const graph = new NodalGraph(viewport);
+const controller = new GraphController(viewport, graph, mouse);
 
 const canvasRenderer = new CanvasRenderer(viewport, graph, controller);
 

@@ -13,6 +13,17 @@ class CanvasRenderer
     this.graph = graph;
     this.controller = controller;
 
+    //Setup canvas
+    window.addEventListener('load', (event) => {
+      //For canvas only...
+      this.canvas.width = window.innerWidth;
+      this.canvas.height = window.innerHeight;
+    });
+    window.addEventListener('resize', (event) => {
+      this.canvas.width = window.innerWidth;
+      this.canvas.height = window.innerHeight;
+    });
+
     this.nodeElements = new Map();
     this.edgeElements = new Map();
     this.selectElements = new Map();
