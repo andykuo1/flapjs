@@ -1,3 +1,5 @@
+import * as Config from 'config.js';
+
 class GraphCursor
 {
   constructor(graph, mouse)
@@ -24,7 +26,7 @@ class GraphCursor
     {
       const dx = x - node.x;
       const dy = y - node.y;
-      if (dx * dx + dy * dy < NODE_RADIUS_SQU)
+      if (dx * dx + dy * dy < Config.NODE_RADIUS_SQU)
       {
         return node;
       }
@@ -39,7 +41,7 @@ class GraphCursor
     {
       const dx = x - edge.x;
       const dy = y - edge.y;
-      if (dx * dx + dy * dy < EDGE_RADIUS_SQU)
+      if (dx * dx + dy * dy < Config.EDGE_RADIUS_SQU)
       {
         return edge;
       }
@@ -55,7 +57,7 @@ class GraphCursor
       const point = edge.getEndPoint();
       const dx = x - point[0];
       const dy = y - point[1];
-      if (dx * dx + dy * dy < ENDPOINT_RADIUS_SQU)
+      if (dx * dx + dy * dy < Config.ENDPOINT_RADIUS_SQU)
       {
         return edge;
       }

@@ -5,6 +5,8 @@ import EditCursorController from 'controller/cursor/EditCursorController.js';
 import MoveCursorController from 'controller/cursor/MoveCursorController.js';
 import SelectCursorController from 'controller/cursor/SelectCursorController.js';
 
+import * as Config from 'config.js';
+
 
 /*
 onSingleTap
@@ -85,10 +87,10 @@ class MainCursorController
     this.hoverTarget = null;
     this.hoverType = null;
 
-    this.shouldDestroyPointlessEdges = DEFAULT_SHOULD_DESTROY_POINTLESS_EDGE;
+    this.shouldDestroyPointlessEdges = Config.DEFAULT_SHOULD_DESTROY_POINTLESS_EDGE;
     //TODO: Trash area should NOT show up on exported image!
-    this.trashArea = { x: TRASH_AREA_POSX, y: TRASH_AREA_POSY,
-                        width: TRASH_AREA_WIDTH, height: TRASH_AREA_HEIGHT };
+    this.trashArea = { x: Config.TRASH_AREA_POSX, y: Config.TRASH_AREA_POSY,
+                        width: Config.TRASH_AREA_WIDTH, height: Config.TRASH_AREA_HEIGHT };
   }
 
   load()
@@ -189,7 +191,7 @@ class MainCursorController
     else
     {
       this.doSingleTap(mx, my);
-      this.doubleTapTicks = DOUBLE_TAP_TICKS;
+      this.doubleTapTicks = Config.DOUBLE_TAP_TICKS;
     }
 
     this.target = null;
@@ -207,7 +209,7 @@ class MainCursorController
 
     let dx = this.tap.x;
     let dy = this.tap.y;
-    let radiusSqu = CURSOR_RADIUS_SQU;
+    let radiusSqu = Config.CURSOR_RADIUS_SQU;
 
     if (this.target != null)
     {
@@ -215,20 +217,20 @@ class MainCursorController
       {
         dx = this.target.x;
         dy = this.target.y;
-        radiusSqu = NODE_RADIUS_SQU;
+        radiusSqu = Config.NODE_RADIUS_SQU;
       }
       else if (this.targetType == "edge")
       {
         dx = this.target.x;
         dy = this.target.y;
-        radiusSqu = EDGE_RADIUS_SQU;
+        radiusSqu = Config.EDGE_RADIUS_SQU;
       }
       else if (this.targetType == "endpoint")
       {
         const endpoint = this.target.getEndPoint();
         dx = endpoint[0];
         dy = endpoint[1];
-        radiusSqu = ENDPOINT_RADIUS_SQU;
+        radiusSqu = Config.ENDPOINT_RADIUS_SQU;
       }
     }
 
@@ -326,13 +328,13 @@ class MainCursorController
 
   createNewState(x, y)
   {
-    const node = this.graph.createNewNode(x, y, STR_STATE_LABEL + (this.graph.nodes.length));
-    node.x = x || (Math.random() * SPAWN_RADIUS * 2) - SPAWN_RADIUS;
-    node.y = y || (Math.random() * SPAWN_RADIUS * 2) - SPAWN_RADIUS;
+    const node = this.graph.createNewNode(x, y, Config.STR_STATE_LABEL + (this.graph.nodes.length));
+    node.x = x || (Math.random() * Config.SPAWN_RADIUS * 2) - Config.SPAWN_RADIUS;
+    node.y = y || (Math.random() * Config.SPAWN_RADIUS * 2) - Config.SPAWN_RADIUS;
     return node;
   }
 
-  createNewTransition(src, dst, label=STR_TRANSITION_DEFAULT_LABEL)
+  createNewTransition(src, dst, label=Config.STR_TRANSITION_DEFAULT_LABEL)
   {
     const edge = this.graph.createNewEdge(src, dst, label);
     return edge;

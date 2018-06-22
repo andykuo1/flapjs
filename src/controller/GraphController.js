@@ -5,6 +5,8 @@ import GraphParser from 'parser/GraphParser.js';
 import DFA from 'tester/DFA.js';
 import NFA from 'tester/NFA.js';
 
+import * as Config from 'config.js';
+
 class GraphController
 {
   constructor(viewport, graph, mouse)
@@ -28,7 +30,7 @@ class GraphController
       inputTest.select();
     });
     inputTest.addEventListener('keyup', (e) => {
-      if (e.keyCode == SUBMIT_KEY)
+      if (e.keyCode == Config.SUBMIT_KEY)
       {
         buttonTest.click();
       }
@@ -108,7 +110,7 @@ class ModeDFA
 
   deactivate()
   {
-    this.controller.cursors.shouldDestroyPointlessEdges = DEFAULT_SHOULD_DESTROY_POINTLESS_EDGE;
+    this.controller.cursors.shouldDestroyPointlessEdges = Config.DEFAULT_SHOULD_DESTROY_POINTLESS_EDGE;
     this.controller.graph.removeListener("edgeCreate", this._onEdgeCreate);
     this.controller.graph.removeListener("edgeDestroy", this._onEdgeDestroy);
   }
@@ -128,7 +130,7 @@ class ModeNFA
 
   deactivate()
   {
-    this.controller.cursors.shouldDestroyPointlessEdges = DEFAULT_SHOULD_DESTROY_POINTLESS_EDGE;
+    this.controller.cursors.shouldDestroyPointlessEdges = Config.DEFAULT_SHOULD_DESTROY_POINTLESS_EDGE;
   }
 }
 

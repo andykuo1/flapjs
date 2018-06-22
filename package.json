@@ -2,18 +2,28 @@
   "name": "flapjs",
   "version": "1.0.0",
   "description": "",
-  "main": "./build/bundle.js",
+  "main": "./dist/bundle.js",
   "scripts": {
-    "build": "webpack --config webpack.config.js",
-    "test": "clear && npm run build && open ./index.html"
+    "start": "webpack-dev-server --mode development --config webpack.config.js",
+    "build": "webpack --mode production --config webpack.config.js"
   },
-  "keywords": [],
   "author": "Andrew Kuo",
   "license": "MIT",
   "dependencies": {
-    "webpack": "^4.5.0"
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1",
+    "react-hot-loader": "^4.3.3"
   },
   "devDependencies": {
-    "webpack-cli": "^2.0.14"
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.4",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-react": "^6.24.1",
+    "css-loader": "^0.28.11",
+    "style-loader": "^0.21.0",
+    "webpack": "^4.12.0",
+    "webpack-cli": "^3.0.8",
+    "webpack-dev-server": "^3.1.4"
   }
 }

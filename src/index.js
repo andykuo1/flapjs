@@ -1,6 +1,7 @@
 import Mouse from 'util/Mouse.js';
+import * as Config from 'config.js';
+
 const viewport = document.getElementById("canvas");
-const ctx = viewport.getContext("2d");
 const mouse = new Mouse(viewport, document);//Or viewport
 const fps = 60.0;
 
@@ -28,7 +29,7 @@ import CanvasRenderer from 'renderer/CanvasRenderer.js';
 const graph = new NodalGraph(viewport);//Or viewport
 const controller = new GraphController(viewport, graph, mouse);//Or viewport
 
-const canvasRenderer = new CanvasRenderer(ctx, viewport, graph, controller);
+const canvasRenderer = new CanvasRenderer(viewport, graph, controller);
 
 function loadApplication()
 {
@@ -51,10 +52,9 @@ function updateApplication(time)
 {
   const dt = (time - prevtime) / fps;
   {
-    ctx.clearRect(0, 0, viewport.width, viewport.height);
     graph.update(dt);
     controller.update(dt);
-    canvasRenderer.render(ctx);
+    canvasRenderer.render();
   }
   prevtime = time;
   window.requestAnimationFrame(updateApplication);

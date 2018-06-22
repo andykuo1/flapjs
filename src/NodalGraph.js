@@ -1,5 +1,7 @@
 import Eventable from 'util/Eventable.js';
 
+import * as Config from 'config.js';
+
 //nodeCreate(node) - Whenever a new node is created
 //nodeDestroy(node) - Whenever a node is destroyed (even on clear)
 //nodeLabel(node, newLabel, oldLabel) - Whenever a node label changes
@@ -75,7 +77,7 @@ export class NodalGraph
   createNewEdge(from, to, label)
   {
     const result = new Edge(this, from, to, label);
-    if (result.isSelfLoop()) result.y = from.y - SELF_LOOP_HEIGHT;
+    if (result.isSelfLoop()) result.y = from.y - Config.SELF_LOOP_HEIGHT;
     this.edges.push(result);
     this.emit("edgeCreate", result);
     return result;
@@ -198,9 +200,9 @@ export class Edge
     {
       const dx = this.from.x - this.to.x;
       const dy = this.from.y - this.to.y;
-      const angle = -Math.atan2(dy, dx) - HALF_PI;
-      const xx = NODE_RADIUS * Math.sin(angle);
-      const yy = NODE_RADIUS * Math.cos(angle);
+      const angle = -Math.atan2(dy, dx) - Config.HALF_PI;
+      const xx = Config.NODE_RADIUS * Math.sin(angle);
+      const yy = Config.NODE_RADIUS * Math.cos(angle);
 
       const startX = this.from.x + xx;
       const startY = this.from.y + yy;
@@ -214,9 +216,9 @@ export class Edge
 
       const dx = this.from.x - quadX;
       const dy = this.from.y - quadY;
-      const angle = -Math.atan2(dy, dx) - HALF_PI + (this.isSelfLoop() ? FOURTH_PI : 0);
-      const xx = NODE_RADIUS * Math.sin(angle);
-      const yy = NODE_RADIUS * Math.cos(angle);
+      const angle = -Math.atan2(dy, dx) - Config.HALF_PI + (this.isSelfLoop() ? Config.FOURTH_PI : 0);
+      const xx = Config.NODE_RADIUS * Math.sin(angle);
+      const yy = Config.NODE_RADIUS * Math.cos(angle);
 
       const result = midpoint;
       result[0] = this.from.x + xx;
@@ -247,10 +249,10 @@ export class Edge
     //Get end point for straight edges...
     if (this.quad == null)
     {
-      const radius = this.isPlaceholder() ? 1 : NODE_RADIUS;
+      const radius = this.isPlaceholder() ? 1 : Config.NODE_RADIUS;
       const dx = this.from.x - this.to.x;
       const dy = this.from.y - this.to.y;
-      const angle = -Math.atan2(dy, dx) - HALF_PI;
+      const angle = -Math.atan2(dy, dx) - Config.HALF_PI;
       const xx = radius * Math.sin(angle);
       const yy = radius * Math.cos(angle);
 
@@ -269,9 +271,9 @@ export class Edge
 
       const dx = quadX - this.to.x;
       const dy = quadY - this.to.y;
-      const angle = -Math.atan2(dy, dx) - HALF_PI + (this.isSelfLoop() ? -FOURTH_PI : 0);
-      const xx = NODE_RADIUS * Math.sin(angle);
-      const yy = NODE_RADIUS * Math.cos(angle);
+      const angle = -Math.atan2(dy, dx) - Config.HALF_PI + (this.isSelfLoop() ? -Config.FOURTH_PI : 0);
+      const xx = Config.NODE_RADIUS * Math.sin(angle);
+      const yy = Config.NODE_RADIUS * Math.cos(angle);
 
       const result = midpoint;
       result[0] = this.to.x - xx;
@@ -335,13 +337,13 @@ export class Edge
     if (!this.to) this.to = { x: this.from.x + 1, y: this.from.y };
     const dx = this.from.x - this.to.x;
     const dy = this.from.y - this.to.y;
-    const angle = -Math.atan2(dx, dy) - HALF_PI;
+    const angle = -Math.atan2(dx, dy) - Config.HALF_PI;
     this.to = {
       from: this.from,
       dx: Math.cos(angle),
       dy: Math.sin(angle),
-      get x() { return this.from.x + PLACEHOLDER_LENGTH * this.dx; },
-      get y() { return this.from.y + PLACEHOLDER_LENGTH * this.dy; }
+      get x() { return this.from.x + Config.PLACEHOLDER_LENGTH * this.dx; },
+      get y() { return this.from.y + Config.PLACEHOLDER_LENGTH * this.dy; }
     };
     this.quad = null;
   }

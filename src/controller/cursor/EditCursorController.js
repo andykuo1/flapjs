@@ -1,5 +1,7 @@
 import CursorController from 'controller/cursor/CursorController.js';
 
+import * as Config from 'config.js';
+
 class EditCursorController extends CursorController
 {
   constructor(mainController, graph)
@@ -44,7 +46,7 @@ class EditCursorController extends CursorController
     if (targetType == "node")
     {
       //Begin creating edge...
-      const edge = this.mainController.createNewTransition(target, null, STR_TRANSITION_PROXY_LABEL);
+      const edge = this.mainController.createNewTransition(target, null, Config.STR_TRANSITION_PROXY_LABEL);
       this.mainController.startMove(edge, "endpoint");
       return true;
     }

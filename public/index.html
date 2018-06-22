@@ -1,5 +1,8 @@
+<!DOCTYPE html>
 <html>
   <head>
+    <meta charset="UTF-8"/>
+    <title>FlapJS</title>
 		<link rel="stylesheet" href="style.css">
   </head>
   <body>
@@ -8,6 +11,7 @@
     </header>
 
     <canvas id="canvas">Sorry! Your browser is not supported.</canvas>
+    <!--div id="root"></div-->
 
     <span id="label-editor">
       <input type="text" id="label-editor-input"/>
@@ -118,8 +122,9 @@
     </footer>
 
     <!-- Entry point -->
-    <script src="lib/download.min.js"></script>
-    <script src="src/Constants.js"></script>
-    <script src="build/bundle.js"></script>
+    <noscript>
+      You need to enable Javascript to run this app.
+    </noscript>
+    <script src="../dist/bundle.js"></script>
   </body>
 </html>

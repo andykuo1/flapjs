@@ -1,5 +1,7 @@
 import CursorController from 'controller/cursor/CursorController.js';
 
+import * as Config from 'config.js';
+
 class MoveCursorConstroller extends CursorController
 {
   constructor(mainController, graph)
@@ -85,9 +87,9 @@ class MoveCursorConstroller extends CursorController
               target.makePlaceholder();
 
               //Open label editor if default edge...
-              if (target.label == STR_TRANSITION_PROXY_LABEL)
+              if (target.label == Config.STR_TRANSITION_PROXY_LABEL)
               {
-                target.label = STR_TRANSITION_DEFAULT_LABEL;
+                target.label = Config.STR_TRANSITION_DEFAULT_LABEL;
                 this.mainController.openLabelEditor(target);
               }
             }
@@ -96,9 +98,9 @@ class MoveCursorConstroller extends CursorController
         else
         {
           //Open label editor if default edge...
-          if (target.label == STR_TRANSITION_PROXY_LABEL)
+          if (target.label == Config.STR_TRANSITION_PROXY_LABEL)
           {
-            target.label = STR_TRANSITION_DEFAULT_LABEL;
+            target.label = Config.STR_TRANSITION_DEFAULT_LABEL;
             this.mainController.openLabelEditor(target);
           }
         }
@@ -195,8 +197,8 @@ class MoveCursorConstroller extends CursorController
         const dx = target.from.x - x;
         const dy = target.from.y - y;
         const angle = Math.atan2(dy, dx);
-        target.x = target.from.x - Math.cos(angle) * SELF_LOOP_HEIGHT;
-        target.y = target.from.y - Math.sin(angle) * SELF_LOOP_HEIGHT;
+        target.x = target.from.x - Math.cos(angle) * Config.SELF_LOOP_HEIGHT;
+        target.y = target.from.y - Math.sin(angle) * Config.SELF_LOOP_HEIGHT;
       }
       else
       {

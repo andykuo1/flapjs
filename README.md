@@ -136,7 +136,7 @@ After saving any changes to a file, open a command line or terminal and enter in
 
 *(If using the recommended atom package, the in-editor terminal is automatically opened at the project directory.)*
 
-To "compile" the scripts:
+To "compile" the scripts for distribution:
 
 ```
 npm run build
@@ -151,10 +151,10 @@ open index.html
 Another way to quickly test the program:
 
 ```
-npm test
+npm start
 ```
 
-This will run all appropriate commands to bundle and build the program, then will run it in your default web browser.
+This will run all appropriate commands to bundle and build the program, then will run it in your default web browser. It is also hot loaded, so changes will be reflected on save.
 
 ---
 

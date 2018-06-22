@@ -1,12 +1,15 @@
 import { Node } from 'NodalGraph.js';
 
+import * as Config from 'config.js';
+
 var hoverAngle = 0;
 class CanvasRenderer
 {
-  constructor(ctx, canvas, graph, controller)
+  constructor(viewport, graph, controller)
   {
-    this.ctx = ctx;
-    this.canvas = canvas;
+    this.viewport = viewport;
+    this.canvas = document.getElementById("canvas");
+    this.ctx = this.canvas.getContext("2d");
     this.graph = graph;
     this.controller = controller;
 
@@ -49,14 +52,16 @@ class CanvasRenderer
     });
   }
 
-  render(ctx)
+  render()
   {
+    const ctx = this.ctx;
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     ctx.save();
     {
       //Default edge styles
-      ctx.font = EDGE_FONT;
-      ctx.textAlign = EDGE_TEXT_ALIGN;
-      ctx.strokeStyle = EDGE_STROKE_STYLE;
+      ctx.font = Config.EDGE_FONT;
+      ctx.textAlign = Config.EDGE_TEXT_ALIGN;
+      ctx.strokeStyle = Config.EDGE_STROKE_STYLE;
 
       //Draw edges
       for(const [edge, element] of this.edgeElements)
@@ -76,10 +81,10 @@ class CanvasRenderer
     ctx.save();
     {
       //Default node styles
-      ctx.font = NODE_FONT;
-      ctx.textAlign = NODE_TEXT_ALIGN;
-      ctx.strokeStyle = NODE_STROKE_STYLE;
-      ctx.fillStyle = NODE_FILL_STYLE;
+      ctx.font = Config.NODE_FONT;
+      ctx.textAlign = Config.NODE_TEXT_ALIGN;
+      ctx.strokeStyle = Config.NODE_STROKE_STYLE;
+      ctx.fillStyle = Config.NODE_FILL_STYLE;
 
       //Draw nodes
       for(const [node, element] of this.nodeElements)
@@ -142,7 +147,7 @@ class CanvasRenderer
     }
     ctx.restore();
 
-    hoverAngle = (hoverAngle + HOVER_ANGLE_SPEED) % PI2;
+    hoverAngle = (hoverAngle + Config.HOVER_ANGLE_SPEED) % Config.PI2;
   }
 }
 
@@ -181,20 +186,20 @@ class NodeElement extends CanvasElement
     const label = this.node.label;
     const accept = this.node.accept;
 
-    ctx.fillStyle = NODE_FILL_STYLE;
+    ctx.fillStyle = Config.NODE_FILL_STYLE;
     ctx.beginPath();
-    ctx.arc(x, y, NODE_RADIUS, 0, PI2);
+    ctx.arc(x, y, Config.NODE_RADIUS, 0, Config.PI2);
     ctx.fill();
     ctx.stroke();
 
     if (accept)
     {
       ctx.beginPath();
-      ctx.arc(x, y, NODE_RADIUS_INNER, 0, PI2);
+      ctx.arc(x, y, Config.NODE_RADIUS_INNER, 0, Config.PI2);
       ctx.stroke();
     }
 
-    ctx.fillStyle = NODE_TEXT_FILL_STYLE;
+    ctx.fillStyle = Config.NODE_TEXT_FILL_STYLE;
     ctx.fillText(label, x, y + 4);
   }
 }
@@ -248,12 +253,12 @@ class EdgeElement extends CanvasElement
     }
 
     ctx.moveTo(
-      endX - (ARROW_WIDTH * Math.sin(arrowAngle - SIXTH_PI)),
-      endY - (ARROW_WIDTH * Math.cos(arrowAngle - SIXTH_PI)));
+      endX - (Config.ARROW_WIDTH * Math.sin(arrowAngle - Config.SIXTH_PI)),
+      endY - (Config.ARROW_WIDTH * Math.cos(arrowAngle - Config.SIXTH_PI)));
     ctx.lineTo(endX, endY);
     ctx.lineTo(
-      endX - (ARROW_WIDTH * Math.sin(arrowAngle + SIXTH_PI)),
-      endY - (ARROW_WIDTH * Math.cos(arrowAngle + SIXTH_PI)));
+      endX - (Config.ARROW_WIDTH * Math.sin(arrowAngle + Config.SIXTH_PI)),
+      endY - (Config.ARROW_WIDTH * Math.cos(arrowAngle + Config.SIXTH_PI)));
     ctx.stroke();
     ctx.closePath();
 
@@ -307,11 +312,11 @@ class InitialMarkerElement extends CanvasElement
     const x = initialNode.x;
     const y = initialNode.y;
 
-    ctx.strokeStyle = EDGE_STROKE_STYLE;
+    ctx.strokeStyle = Config.EDGE_STROKE_STYLE;
     ctx.beginPath();
-    ctx.moveTo(x - NODE_RADIUS, y);
-    ctx.lineTo(x - NODE_DIAMETER, y - NODE_RADIUS);
-    ctx.lineTo(x - NODE_DIAMETER, y + NODE_RADIUS);
+    ctx.moveTo(x - Config.NODE_RADIUS, y);
+    ctx.lineTo(x - Config.NODE_DIAMETER, y - Config.NODE_RADIUS);
+    ctx.lineTo(x - Config.NODE_DIAMETER, y + Config.NODE_RADIUS);
     ctx.closePath();
     ctx.stroke();
   }
@@ -333,12 +338,12 @@ class SelectionBoxElement extends CanvasElement
     const dy = this.selectBox.my - this.selectBox.y;
     ctx.save();
     {
-      ctx.shadowColor = SELECTION_BOX_SHADOW_COLOR;
-      ctx.shadowBlur = SELECTION_BOX_SHADOW_SIZE;
-      ctx.shadowOffsetX = SELECTION_BOX_SHADOW_OFFSETX;
-      ctx.shadowOffsetY = SELECTION_BOX_SHADOW_OFFSETY;
-      ctx.fillStyle = SELECTION_BOX_FILL_STYLE;
-      ctx.strokeStyle = SELECTION_BOX_STROKE_STYLE;
+      ctx.shadowColor = Config.SELECTION_BOX_SHADOW_COLOR;
+      ctx.shadowBlur = Config.SELECTION_BOX_SHADOW_SIZE;
+      ctx.shadowOffsetX = Config.SELECTION_BOX_SHADOW_OFFSETX;
+      ctx.shadowOffsetY = Config.SELECTION_BOX_SHADOW_OFFSETY;
+      ctx.fillStyle = Config.SELECTION_BOX_FILL_STYLE;
+      ctx.strokeStyle = Config.SELECTION_BOX_STROKE_STYLE;
       ctx.fillRect(this.selectBox.x, this.selectBox.y, dx, dy);
       ctx.strokeRect(this.selectBox.x, this.selectBox.y, dx, dy);
     }
@@ -367,24 +372,24 @@ class HoverElement extends CanvasElement
 
     let x = 0;
     let y = 0;
-    let r = CURSOR_RADIUS;
+    let r = Config.CURSOR_RADIUS;
     switch(type)
     {
       case "node":
         x = target.x;
         y = target.y;
-        r = NODE_RADIUS;
+        r = Config.NODE_RADIUS;
         break;
       case "edge":
         x = target.x;
         y = target.y;
-        r = EDGE_RADIUS;
+        r = Config.EDGE_RADIUS;
         break;
       case "endpoint":
         const endpoint = target.getEndPoint();
         x = endpoint[0];
         y = endpoint[1];
-        r = ENDPOINT_RADIUS;
+        r = Config.ENDPOINT_RADIUS;
         break;
       default:
         x = x;
@@ -394,16 +399,16 @@ class HoverElement extends CanvasElement
     ctx.save();
     {
       const angle = hoverAngle;
-      ctx.strokeStyle = HOVER_STROKE_STYLE;
-      ctx.lineWidth = HOVER_LINE_WIDTH;
+      ctx.strokeStyle = Config.HOVER_STROKE_STYLE;
+      ctx.lineWidth = Config.HOVER_LINE_WIDTH;
       ctx.beginPath();
-      ctx.setLineDash(HOVER_LINE_DASH);
-      ctx.arc(x, y, r + HOVER_RADIUS_OFFSET, 0 + angle, PI2 + angle);
+      ctx.setLineDash(Config.HOVER_LINE_DASH);
+      ctx.arc(x, y, r + Config.HOVER_RADIUS_OFFSET, 0 + angle, Config.PI2 + angle);
       ctx.stroke();
     }
     ctx.restore();
 
-    hoverAngle = (hoverAngle + HOVER_ANGLE_SPEED) % PI2;
+    hoverAngle = (hoverAngle + Config.HOVER_ANGLE_SPEED) % Config.PI2;
   }
 }
 
@@ -425,24 +430,24 @@ class SelectElement extends CanvasElement
 
     let x = 0;
     let y = 0;
-    let r = CURSOR_RADIUS;
+    let r = Config.CURSOR_RADIUS;
     switch(type)
     {
       case "node":
         x = target.x;
         y = target.y;
-        r = NODE_RADIUS;
+        r = Config.NODE_RADIUS;
         break;
       case "edge":
         x = target.x;
         y = target.y;
-        r = EDGE_RADIUS;
+        r = Config.EDGE_RADIUS;
         break;
       case "endpoint":
         const endpoint = target.getEndPoint();
         x = endpoint[0];
         y = endpoint[1];
-        r = ENDPOINT_RADIUS;
+        r = Config.ENDPOINT_RADIUS;
         break;
       default:
         x = x;
@@ -452,11 +457,11 @@ class SelectElement extends CanvasElement
     ctx.save();
     {
       const angle = hoverAngle;
-      ctx.strokeStyle = HOVER_STROKE_STYLE;
-      ctx.lineWidth = HOVER_LINE_WIDTH;
+      ctx.strokeStyle = Config.HOVER_STROKE_STYLE;
+      ctx.lineWidth = Config.HOVER_LINE_WIDTH;
       ctx.beginPath();
-      ctx.setLineDash(HOVER_LINE_DASH);
-      ctx.arc(x, y, r + HOVER_RADIUS_OFFSET, 0 + angle, PI2 + angle);
+      ctx.setLineDash(Config.HOVER_LINE_DASH);
+      ctx.arc(x, y, r + Config.HOVER_RADIUS_OFFSET, 0 + angle, Config.PI2 + angle);
       ctx.stroke();
     }
     ctx.restore();
@@ -475,12 +480,12 @@ class TrashAreaElement extends CanvasElement
   {
     super.onRender(ctx);
 
-    ctx.shadowColor = TRASH_AREA_SHADOW_COLOR;
-    ctx.shadowBlur = TRASH_AREA_SHADOW_SIZE;
-    ctx.shadowOffsetX = TRASH_AREA_SHADOW_OFFSETX;
-    ctx.shadowOffsetY = TRASH_AREA_SHADOW_OFFSETY;
-    ctx.fillStyle = TRASH_AREA_FILL_STYLE;
-    ctx.strokeStyle = TRASH_AREA_STROKE_STYLE;
+    ctx.shadowColor = Config.TRASH_AREA_SHADOW_COLOR;
+    ctx.shadowBlur = Config.TRASH_AREA_SHADOW_SIZE;
+    ctx.shadowOffsetX = Config.TRASH_AREA_SHADOW_OFFSETX;
+    ctx.shadowOffsetY = Config.TRASH_AREA_SHADOW_OFFSETY;
+    ctx.fillStyle = Config.TRASH_AREA_FILL_STYLE;
+    ctx.strokeStyle = Config.TRASH_AREA_STROKE_STYLE;
     ctx.fillRect(this.trashArea.x, this.trashArea.y, this.trashArea.width, this.trashArea.height);
     ctx.strokeRect(this.trashArea.x, this.trashArea.y, this.trashArea.width, this.trashArea.height);
   }
