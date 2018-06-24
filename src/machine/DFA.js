@@ -1,36 +1,57 @@
+import FSA from './FSA.js';
+
 const SRC = 0;
 const SYMBOL = 1;
 const DST = 2;
 
-class DFA
+class DFA extends FSA
 {
   constructor()
   {
-    this._states = [];
-    this._transitions = [];
-    this._finalStates = [];
+    super();
   }
 
-  newState(state)
+  validate()
   {
-    if (this._states.includes(state))
+    const alphabet = this.getAlphabet();
+    const foundSymbols = new Array(alphabet.length);
+    foundSymbols.fill(false);
+
+    for(const state of this._states)
     {
-      throw new Error("State \'" + state + "\' already added to states.");
+      //Get all outgoing transitions
+      const transitions = this.getOutgoingTransitions(state);
+      for(const transition of transitions)
+      {
+        const index = alphabet.indexOf(transition[1]);
+        if (foundSymbols[index] == false)
+        {
+          foundSymbols[index] = true;
+        }
+        else
+        {
+          //Found duplicate
+          return false;
+        }
+      }
+
+      //Reset foundSymbols for next state
+      const length = foundSymbols.length;
+      for(let i = 0; i < length; ++i)
+      {
+        if (foundSymbols[i] == false)
+        {
+          //Found missing symbol for state
+          return false;
+        }
+        foundSymbols[i] = false;
+      }
     }
 
-    this._states.push(state);
+    return true;
   }
 
-  deleteState(state)
-  {
-    if (!this._states.includes(state))
-    {
-      throw new Error("State \'" + state + "\' does not exist.");
-    }
-
-    this._states.splice(this._states.indexOf(state), 1);
-  }
-
+  //Override default behavior
   newTransition(fromState, toState, symbol)
   {
     if (!this._states.includes(fromState))
@@ -51,7 +72,7 @@ class DFA
         return;
       }
       //Check if valid deterministic transition...
-      else (transition[SRC] == fromState && transition[SYMBOL] == symbol)
+      else if (transition[SRC] == fromState && transition[SYMBOL] == symbol)
       {
         throw new Error("Unable to create illegal nondeterministic transition for DFA.");
       }
@@ -59,113 +80,6 @@ class DFA
 
     //Create new transition
     this._transitions.push([fromState, symbol, toState]);
-  }
-
-  deleteTransition(fromState, toState, symbol=null)
-  {
-    for(let i = this._transitions.length - 1; i >= 0; --i)
-    {
-      const transition = this._transitions[i];
-      if (transition[SRC] == fromState && transition[DST] == toState)
-      {
-        //Delete if src, dst, and symbols match... or if deleting all symbols
-        if (symbol == null || transition[SYMBOL] == symbol)
-        {
-          this._transitions.splice(i, 1);
-        }
-      }
-    }
-  }
-
-  setStartState(state)
-  {
-    if (this._states.length <= 0)
-    {
-      throw new Error("Not enough states.");
-    }
-
-    if (!this._states.includes(state))
-    {
-      throw new Error("State \'" + state + "\' does not exist.");
-    }
-
-    if (this.getStartState() == state) return;
-
-    this._states.splice(this._states.indexOf(state), 1);
-    this._states.unshift(state);
-  }
-
-  setFinalState(state, isFinal=true)
-  {
-    if (!this._states.includes(state))
-    {
-      throw new Error("State \'" + state + "\' does not exist.");
-    }
-
-    if (isFinal)
-    {
-      if (this._finalStates.includes(state)) return;
-
-      this._finalStates.push(state);
-    }
-    else
-    {
-      if (!this._finalStates.includes(state)) return;
-      this._finalStates.splice(this._finalStates.indexOf(state), 1);
-    }
-  }
-
-  doTransition(state, symbol)
-  {
-    for(const transition of this._transitions)
-    {
-      if (transition[SRC] == state && transition[SYMBOL] == symbol)
-      {
-        return transition[DST];
-      }
-    }
-    return null;
-  }
-
-  hasState(state)
-  {
-    return this._states.includes(state);
-  }
-
-  getStates()
-  {
-    return this._states;
-  }
-
-  getAlphabet()
-  {
-    const result = [];
-    for(const value of this._transitions.values())
-    {
-      for(const symbol of value)
-      {
-        if (!result.includes(symbol))
-        {
-          result.push(symbol);
-        }
-      }
-    }
-    return result;
-  }
-
-  getTransitions()
-  {
-    return this._transitions;
-  }
-
-  getStartState()
-  {
-    return this._states.length <= 0 ? null : this._states[0];
-  }
-
-  getFinalStates()
-  {
-    return this._finalStates;
   }
 }
 

@@ -2,8 +2,10 @@ import MainCursorController from 'controller/cursor/MainCursorController.js';
 import MainButtonController from 'controller/button/MainButtonController.js';
 import GraphParser from 'parser/GraphParser.js';
 
-import DFA from 'tester/DFA.js';
-import NFA from 'tester/NFA.js';
+import DFA from 'machine/DFA.js';
+import NFA from 'machine/NFA.js';
+import { solveDFA } from 'machine/util/solveDFA.js';
+import { solveNFA } from 'machine/util/solveNFA.js';
 
 import * as Config from 'config.js';
 
@@ -47,29 +49,27 @@ class GraphController
 
   test(input)
   {
-    const transitions = [];
+    const nfa = new NFA();
+    for(const node of this.graph.nodes)
+    {
+      const state = nfa.newState(node.label);
+      if (node.accept)
+      {
+        nfa.setFinalState(state);
+      }
+    }
+
     for(const edge of this.graph.edges)
     {
       for(const label of edge.label.split(" "))
       {
-        let transition = [];
-        transition.push(edge.from.label);
-        transition.push(label);
-        transition.push(edge.to ? edge.to.label : "undefined");
-        transitions.push(transition);
+        nfa.newTransition(edge.from.label, edge.to ? edge.to.label : "undefined", label);
       }
     }
-    const start = this.graph.getInitialState().label;
-    const finals = [];
-    for(const node of this.graph.nodes)
-    {
-      if (node.accept)
-      {
-        finals.push(node.label);
-      }
-    }
-    const tester = new NFA(transitions, start, finals);
-    return tester.solve(input);
+
+    nfa.setStartState(this.graph.getInitialState().label);
+
+    return solveNFA(nfa, input);
   }
 
   update(dt)
