@@ -1,4 +1,4 @@
-import GraphSorter from 'GraphSorter.js';
+import GraphSorter from 'graph/GraphSorter.js';
 
 import * as Config from 'config.js';
 

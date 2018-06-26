@@ -19,7 +19,7 @@ window.addEventListener('resize', (event) => {
 });
 
 //Setup application
-import { NodalGraph } from 'NodalGraph.js';
+import { NodalGraph } from 'graph/NodalGraph.js';
 import GraphController from 'controller/GraphController.js';
 import CanvasRenderer from 'renderer/CanvasRenderer.js';
 import ReactRenderer from 'renderer/ReactRenderer.js';

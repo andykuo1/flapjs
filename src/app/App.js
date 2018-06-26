@@ -1,7 +1,7 @@
 import React from 'react';
 import { hot } from 'react-hot-loader';
 
-import { Node } from 'NodalGraph.js';
+import { Node } from 'graph/NodalGraph.js';
 
 import * as Config from 'config.js';
 

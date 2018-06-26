@@ -1,4 +1,4 @@
-import { Node } from 'NodalGraph.js';
+import { Node } from 'graph/NodalGraph.js';
 
 import * as Config from 'config.js';
 
