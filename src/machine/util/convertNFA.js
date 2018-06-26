@@ -44,7 +44,7 @@ function expandNFAStateToDFA(state, nfa, dfa)
   for(const symbol of alphabet)
   {
     //Get all closed reachable states...
-    nfaStates = getNFAStatesFromDFA(state);
+    nfaStates = getSetFromState(state);
     for(const s of nfaStates)
     {
       nfa.doTerminalTransition(s, symbol, terminals);
@@ -53,7 +53,7 @@ function expandNFAStateToDFA(state, nfa, dfa)
     //If has reachable states...
     if (terminals.length > 0)
     {
-      dfaState = getDFAStateFromNFA(terminals);
+      dfaState = getStateFromSet(terminals);
 
       //Create state if it does not exist...
       if (!dfa.hasState(dfaState))
@@ -75,7 +75,7 @@ function expandNFAStateToDFA(state, nfa, dfa)
 
 function newDFAStateFromNFA(dfa, nfa, nfaStates)
 {
-  const result = dfa.newState(getDFAStateFromNFA(nfaStates));
+  const result = dfa.newState(getStateFromSet(nfaStates));
 
   //If the NFA states contain a final, then DFA state should be final
   for(const s of nfaStates)
@@ -90,13 +90,13 @@ function newDFAStateFromNFA(dfa, nfa, nfaStates)
   return result;
 }
 
-function getDFAStateFromNFA(nfaStates)
+function getStateFromSet(nfaStates)
 {
   nfaStates.sort();
   return "{" + nfaStates.join(",") + "}";
 }
 
-function getNFAStatesFromDFA(dfaState)
+function getSetFromState(dfaState)
 {
   return dfaState.substring(1, dfaState.length - 1).split(",");
 }
