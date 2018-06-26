@@ -3,11 +3,12 @@ import DFA from 'machine/DFA.js';
 import { EMPTY } from 'machine/Symbols.js';
 
 import { isEquivalentFSA } from 'machine/util/equalFSA.js';
+import { isEquivalentDFA } from 'machine/util/equalFSA.js';
 
 let dfa1 = new DFA();
 let dfa2 = new DFA();
 
-TEST.assertEquals(true, isEquivalentFSA(dfa1, dfa2), "Empty machines.");
+TEST.assertEquals(true, isEquivalentDFA(dfa1, dfa2), "Empty machines.");
 
 //= accepts all strings
 //Make first machine
@@ -18,11 +19,11 @@ dfa1.setFinalState("q0");
 dfa2.newState("q0");
 dfa2.setFinalState("q0");
 
-TEST.assertEquals(true, isEquivalentFSA(dfa1, dfa2), "Universal machines.");
+TEST.assertEquals(true, isEquivalentDFA(dfa1, dfa2), "Universal machines.");
 
 dfa2.setFinalState("q0", false);
 
-TEST.assertEquals(false, isEquivalentFSA(dfa1, dfa2), "Universal vs none machines.");
+TEST.assertEquals(false, isEquivalentDFA(dfa1, dfa2), "Universal vs none machines.");
 
 //= (aa)*
 //Make first machine
@@ -44,11 +45,12 @@ dfa2.newTransition("q3", "q0", "a");
 dfa2.setFinalState("q1");
 dfa2.setFinalState("q3");
 
+TEST.assertEquals(true, isEquivalentDFA(dfa1, dfa2), "(aa)* machines.");
 TEST.assertEquals(true, isEquivalentFSA(dfa1, dfa2), "(aa)* machines.");
 
 dfa2.setFinalState("q0");
 
-TEST.assertEquals(false, isEquivalentFSA(dfa1, dfa2), "(a)* vs (aa)* machines.");
+TEST.assertEquals(false, isEquivalentDFA(dfa1, dfa2), "(a)* vs (aa)* machines.");
 
 dfa1 = new DFA();
 dfa2 = new DFA();
@@ -65,4 +67,4 @@ dfa2.newTransition("q0", "q1", "a");
 dfa2.newTransition("q1", "q0", "a");
 dfa2.setFinalState("q1");
 
-TEST.assertEquals(false, isEquivalentFSA(dfa1, dfa2), "a vs 1 machines.");
+TEST.assertEquals(false, isEquivalentDFA(dfa1, dfa2), "a vs 1 machines.");
