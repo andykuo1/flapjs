@@ -18,14 +18,14 @@ machine.setFinalState(state0);
 //Should accept the empty string since start state is final state
 TEST.assertEquals(solveNFA(machine, ""), true, "Machine accepts the empty string.");
 
-console.error("Testing other input strings...");
+TEST.out("Testing DFA-like NFA machine...");
 TEST.assertEquals(solveNFA(machine, "0"), false);
 TEST.assertEquals(solveNFA(machine, "1"), true);
 TEST.assertEquals(solveNFA(machine, "011111"), false);
 TEST.assertEquals(solveNFA(machine, "11010101"), false);
 TEST.assertEquals(solveNFA(machine, "1111"), true);
 
-console.error("Testing second machine...");
+TEST.out("Testing NFA with immediate transitions...");
 machine = new NFA();
 state0 = machine.newState("q0");
 state1 = machine.newState("q1");
@@ -42,7 +42,7 @@ machine.setFinalState(state2);
 //Should accept the empty string since start state is final state
 TEST.assertEquals(solveNFA(machine, ""), false, "Machine rejects the empty string.");
 
-console.error("Testing other input strings...");
+TEST.out("Testing other input strings...");
 TEST.assertEquals(solveNFA(machine, "0"), true);
 TEST.assertEquals(solveNFA(machine, "1"), true);
 TEST.assertEquals(solveNFA(machine, "011111"), true);

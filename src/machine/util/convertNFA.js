@@ -10,7 +10,7 @@ export function convertToDFA(nfa)
 
   //Make new DFA start state
   let nextStates = nfa.doClosureTransition(startState);
-  const newStartState = result.newState(fromSetToString(nextStates));
+  const newStartState = newDFAStateFromNFA(result, nfa, nextStates);
 
   //Start expansion with the start state
   const states = [];
@@ -20,7 +20,7 @@ export function convertToDFA(nfa)
   while(states.length > 0)
   {
     const nextState = states.shift();
-    nextStates = expandState(nextState, nfa, dfa);
+    nextStates = expandNFAStateToDFA(nextState, nfa, result);
 
     //Push all nextStates to end of states
     for(const s of nextStates)
@@ -32,7 +32,7 @@ export function convertToDFA(nfa)
   return result;
 }
 
-function expandState(state, nfa, dfa)
+function expandNFAStateToDFA(state, nfa, dfa)
 {
   const result = [];
   const alphabet = nfa.getAlphabet();
@@ -44,7 +44,7 @@ function expandState(state, nfa, dfa)
   for(const symbol of alphabet)
   {
     //Get all closed reachable states...
-    nfaStates = fromStringToSet(state);
+    nfaStates = getNFAStatesFromDFA(state);
     for(const s of nfaStates)
     {
       nfa.doTerminalTransition(s, symbol, terminals);
@@ -53,12 +53,12 @@ function expandState(state, nfa, dfa)
     //If has reachable states...
     if (terminals.length > 0)
     {
-      dfaState = fromSetToString(terminals);
+      dfaState = getDFAStateFromNFA(terminals);
 
       //Create state if it does not exist...
-      if (!result.includes(dfaState))
+      if (!dfa.hasState(dfaState))
       {
-        dfa.newState(dfaState);
+        dfaState = newDFAStateFromNFA(dfa, nfa, terminals);
         result.push(dfaState);
       }
 
@@ -73,13 +73,30 @@ function expandState(state, nfa, dfa)
   return result;
 }
 
-function fromSetToString(set)
+function newDFAStateFromNFA(dfa, nfa, nfaStates)
 {
-  set.sort();
-  return "{" + set.join(",") + "}";
+  const result = dfa.newState(getDFAStateFromNFA(nfaStates));
+
+  //If the NFA states contain a final, then DFA state should be final
+  for(const s of nfaStates)
+  {
+    if (nfa.isFinalState(s))
+    {
+      dfa.setFinalState(result);
+      break;
+    }
+  }
+
+  return result;
 }
 
-function fromStringToSet(string)
+function getDFAStateFromNFA(nfaStates)
 {
-  return string.substring(1, string.length - 1).split(",");
+  nfaStates.sort();
+  return "{" + nfaStates.join(",") + "}";
+}
+
+function getNFAStatesFromDFA(dfaState)
+{
+  return dfaState.substring(1, dfaState.length - 1).split(",");
 }

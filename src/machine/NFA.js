@@ -12,6 +12,22 @@ class NFA extends FSA
     super();
   }
 
+  //Override
+  getAlphabet()
+  {
+    const result = [];
+    for(const transition of this._transitions)
+    {
+      const symbol = transition[SYMBOL];
+      if (!result.includes(symbol) && symbol != EMPTY)
+      {
+        result.push(symbol);
+      }
+    }
+    return result;
+  }
+
+  //Override
   doTransition(state, symbol, dst=[])
   {
     const result = dst;

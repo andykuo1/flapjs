@@ -1,51 +1,74 @@
 const TEST_DIR = './src/debug/test/';
 const fs = require('fs');
 
-console.error("Loading tests...");
-const files = fs.readdirSync(TEST_DIR);
-console.error("- - - - - - - - - - - -");
-console.error("Starting " + files.length + " test(s)...");
-console.error("- - - - - - - - - - - -\n");
+//For unit testing...
+let testBuffer = [];
+let testSuccesses = 0;
+let testFailures = 0;
 
-let failure = 0;
+//Start of program
+
+console.error("Preparing tests...");
+const files = fs.readdirSync(TEST_DIR);
+console.error("Starting " + files.length + " test(s)...");
+console.error("- - - - - - - - - - - - - - - - - -\n");
 const length = files.length;
 for(let i = 0; i < length; ++i)
 {
   const file = files[i];
-  let error = false;
-  console.error("Test (" + i + "/" + length + ") - \'" + file + "\':");
-  try
+  let success = true;
+  console.error("== TEST #" + i + " == (" + file + ")");
   {
-    require("./test/" + file);
+    try
+    {
+      testBuffer.length = 0;
+      testSuccesses = 0;
+      testFailures = 0;
+      require('./test/' + file);
+      success = testFailures == 0;
+
+      if (!success)
+      {
+        while(testBuffer.length > 0)
+        {
+          const msg = testBuffer.shift();
+          console.error(msg);
+        }
+      }
+
+      ++testSuccesses;
+    }
+    catch(e)
+    {
+      console.error(e);
+      success = false;
+      ++testFailures;
+    }
   }
-  catch(e)
-  {
-    console.error("Exception thrown", e.stack);
-    error = true;
-    ++failure;
-  }
-  console.error(error ? "...TEST FAILURE!\n" : "...TEST SUCCESS!\n");
+  const totals = "(" + testSuccesses + "/" + (testSuccesses + testFailures) + ")";
+  console.error("== > " + (success ? "SUCCESS!" : "FAILURE!") + " " + totals + "\n");
 }
-console.error("- - - - - - - - - - - -");
-if (failure == 0)
+
+console.error("- - - - - - - - - - - - - - - - - -\n");
+
+//End of program
+
+export function out(msg)
 {
-  console.error("(" + length + "/" + length + ") tests SUCCEEDED!");
+  testBuffer.push(msg);
 }
-else
-{
-  console.error("(" + failure + "/" + length + ") tests FAILED!");
-}
-console.error("- - - - - - - - - - - -\n");
 
 export function assertNotNull(value, msg=null)
 {
   if (!value)
   {
-    console.error("= = Failed: Value is null" + (msg ? " - " + msg : "."));
+    ++testFailures;
+    testBuffer.push("= Failed: Value is null" + (msg ? " - " + msg : "."));
   }
   else
   {
-    console.error("= Passed!" + (msg ? " - " + msg : ""));
+    ++testSuccesses;
+    testBuffer.push("= Passed!");
   }
 }
 
@@ -53,11 +76,13 @@ export function assertEquals(expected, value, msg=null)
 {
   if (expected != value)
   {
-    console.error("= = Failed: Expected \'" + expected + ", but found \'" + value + "\'" + (msg ? " - " + msg : "."));
+    ++testFailures;
+    testBuffer.push("= Failed: Expected \'" + expected + ", but found \'" + value + "\'" + (msg ? " - " + msg : "."));
   }
   else
   {
-    console.error("= Passed!" + (msg ? " - " + msg : ""));
+    ++testSuccesses;
+    testBuffer.push("= Passed!");
   }
 }
 
@@ -65,10 +90,12 @@ export function assert(condition, msg=null)
 {
   if (!condition)
   {
-    console.error("= = Failed" + (msg ? " - " + msg : "."));
+    ++testFailures;
+    testBuffer.push("= Failed" + (msg ? " - " + msg : "."));
   }
   else
   {
-    console.error("= Passed!" + (msg ? " - " + msg : ""));
+    ++testSuccesses;
+    testBuffer.push("= Passed!");
   }
 }

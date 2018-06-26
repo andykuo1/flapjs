@@ -138,6 +138,18 @@ class FSA
     return this._states;
   }
 
+  isAlphabet(symbol)
+  {
+    for(const transition of this._transitions)
+    {
+      if (transition[SYMBOL] == symbol)
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+
   getAlphabet()
   {
     const result = [];
@@ -161,6 +173,11 @@ class FSA
       result.push(transition);
     }
     return result;
+  }
+
+  getTransitions()
+  {
+    return this._transitions;
   }
 
   getStartState()

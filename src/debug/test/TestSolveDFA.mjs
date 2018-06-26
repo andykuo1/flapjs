@@ -20,7 +20,7 @@ TEST.assert(machine.validate(), "Machine is valid.");
 //Should accept the empty string since start state is final state
 TEST.assertEquals(solveDFA(machine, ""), true, "Machine accepts the empty string.");
 
-console.error("Testing other input strings...");
+TEST.out("Testing other input strings...");
 TEST.assertEquals(solveDFA(machine, "0"), false);
 TEST.assertEquals(solveDFA(machine, "1"), true);
 TEST.assertEquals(solveDFA(machine, "011111"), false);
