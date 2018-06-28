@@ -1,3 +1,5 @@
+//TODO: return errors for highlighting and logging.
+
 export function validateDFAGraph(graph)
 {
   //Rules:

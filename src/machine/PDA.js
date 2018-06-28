@@ -1,8 +1,11 @@
+
 const SRC = 0;
 const SYMBOL = 1;
 const DST = 2;
+const POP_SYMBOL = 3;
+const PUSH_SYMBOL = 4;
 
-class FSA
+class PDA
 {
   constructor()
   {
@@ -11,6 +14,7 @@ class FSA
     this._finalStates = [];
 
     this._customAlphabet = [];
+    this._customStackAlphabet = [];
   }
 
   newState(state)
@@ -34,7 +38,7 @@ class FSA
     this._states.splice(this._states.indexOf(state), 1);
   }
 
-  newTransition(fromState, toState, symbol)
+  newTransition(fromState, toState, symbol, popSymbol, pushSymbol)
   {
     if (!this._states.includes(fromState))
     {
@@ -56,7 +60,7 @@ class FSA
     }
 
     //Create new transition
-    this._transitions.push([fromState, symbol, toState]);
+    this._transitions.push([fromState, symbol, toState, popSymbol, pushSymbol]);
   }
 
   deleteTransition(fromState, toState, symbol=null)
@@ -93,6 +97,26 @@ class FSA
     }
 
     this._customAlphabet.splice(this._customAlphabet.indexOf(symbol), 1);
+  }
+
+  newStackSymbol(symbol)
+  {
+    if (this._customStackAlphabet.includes(symbol))
+    {
+      throw new Error("Symbol \'" + symbol + "\' already added to stack alphabet.");
+    }
+
+    this._customStackAlphabet.push(symbol);
+  }
+
+  deleteStackSymbol(symbol)
+  {
+    if (!this._customStackAlphabet.includes(symbol))
+    {
+      throw new Error("Unable to remove symbol \'" + symbol + "\' from stack alphabet.");
+    }
+
+    this._customStackAlphabet.splice(this._customStackAlphabet.indexOf(symbol), 1);
   }
 
   setStartState(state)
@@ -253,4 +277,4 @@ class FSA
   }
 }
 
-export default FSA;
+export default PDA;
