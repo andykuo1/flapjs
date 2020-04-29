@@ -1,4 +1,4 @@
-# FlapJS
+# FlapJS (The Original Prototype)
 > By the students. For the students.
 
 ---
